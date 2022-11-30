@@ -20,14 +20,23 @@ Provide implementation of experiments described in:
 
 ## Installation
 
-    mkdir csnn-simulator-build
-    cd csnn-simulator-build
-    cmake ../csnn-simulator -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_GUI=NO
-    make
+### Dependencies
+```
+sudo apt update
+sudo apt install --yes gcc g++ make cmake libatlas-base-dev libblas-dev libopenblas-dev liblapack-dev liblapacke-dev libopencv-dev python3-opencv
+sudo add-apt-repository ppa:rock-core/qt4 && sudo apt install qt4-default
+```
+### Compile
+```
+mkdir csnn-simulator-build
+cd csnn-simulator-build
+cmake ../csnn-simulator -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_GUI=NO
+make
+```
 
 ## Usage
-
 Run MNIST Example:
-
-    export INPUT_PATH=/path/to/mnist/
-    ./Mnist
+```
+export INPUT_PATH=/path/to/mnist/
+./Mnist
+```

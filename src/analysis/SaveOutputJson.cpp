@@ -94,11 +94,14 @@ std::string SaveOutputJson::_to_json_string(const std::string& label, const Tens
 		for(size_t y=0; y<height; y++) {
 			for(size_t z=0; z<depth; z++) {
 				float t = sample.at(x, y, z);
-				JsonObject spk_obj = spks_arr.createNestedObject();
-				spk_obj["x"] = x;
-				spk_obj["y"] = y;
-				spk_obj["z"] = z;
-				spk_obj["time"] = t;
+				// Save spikes with t in [0,1[
+				if (true) {//(t != INFINITE_TIME) {
+					JsonObject spk_obj = spks_arr.createNestedObject();
+					spk_obj["x"] = x;
+					spk_obj["y"] = y;
+					spk_obj["z"] = z;
+					spk_obj["time"] = t;
+				}
 			}
 		}
 	}

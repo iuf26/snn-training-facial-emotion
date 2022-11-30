@@ -61,12 +61,13 @@ int main(int argc, char** argv) {
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
 	// Save conv1 output
+	// IMPOSSIBLE BECAUSE TOO BIG
 	//auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
 	//conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
 
 	// Save mean pool1 output
 	auto& pool1_save = experiment.output<SpikeTiming>(conv1);
-	pool1_save.add_postprocessing<process::MeanPooling>(2, 2);
+	pool1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
 	pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// Output analysis

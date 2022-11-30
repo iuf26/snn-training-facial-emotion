@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 	pool2_save.add_analysis<analysis::SaveOutputJson>("pool2_train.json", "pool2_test.json");
 
 	// Output analysis
-	auto& pool2_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
 	//pool2_out.add_postprocessing<process::SumPooling>(2, 2);
 	//pool2_out.add_postprocessing<process::FeatureScaling>();
 	pool2_out.add_analysis<analysis::Svm>();

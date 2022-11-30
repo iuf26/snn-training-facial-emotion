@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 
 	// Save output
 	auto& pool2_save = experiment.output<NoOutputConversion>(pool2);
-	pool2_save.add_analysis<analysis::SaveOutputJson>("sum_pool2_train.json", "sum_pool2_test.json");
+	pool2_save.add_analysis<analysis::SaveOutputJson>("pool2_train.json", "pool2_test.json");
 
 	// Output analysis
 	auto& pool2_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);

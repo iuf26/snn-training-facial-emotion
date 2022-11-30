@@ -60,16 +60,20 @@ int main(int argc, char** argv) {
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(2.0, 0.1); //not as in the paper Pattern Recognition
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
-	// Save output
-	auto& conv1_save = experiment.output<SpikeTiming>(conv1);
-	//conv1_save.add_postprocessing<process::SumPooling>(2, 2);
-	conv1_save.add_analysis<analysis::SaveOutputJson>("sum_conv1_train.json", "sum_conv1_test.json");
+	// Save conv1 output
+	//auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
+	//conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
+
+	// Save mean pool1 output
+	auto& pool1_save = experiment.output<SpikeTiming>(conv1);
+	pool1_save.add_postprocessing<process::MeanPooling>(2, 2);
+	pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// Output analysis
-	//auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
-	//conv1_out.add_postprocessing<process::SumPooling>(2, 2);
-	//conv1_out.add_postprocessing<process::FeatureScaling>();
-	//conv1_out.add_analysis<analysis::Svm>();
+	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
+	conv1_out.add_postprocessing<process::FeatureScaling>();
+	conv1_out.add_analysis<analysis::Svm>();
 
 #ifdef ENABLE_QT
 	conv1.plot_threshold(true);

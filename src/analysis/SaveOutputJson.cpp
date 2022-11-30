@@ -102,11 +102,13 @@ std::string SaveOutputJson::_to_json_string(const std::string& label, const Tens
 		for(size_t y=0; y<height; y++) {
 			for(size_t z=0; z<depth; z++) {
 				Time t = sample.at(x, y, z);
-				JsonObject spk_obj = spks_arr.createNestedObject();
-				spk_obj["x"] = x;
-				spk_obj["y"] = y;
-				spk_obj["z"] = z;
-				spk_obj["time"] = t;
+				if (t < 1) {
+					JsonObject spk_obj = spks_arr.createNestedObject();
+					spk_obj["x"] = x;
+					spk_obj["y"] = y;
+					spk_obj["z"] = z;
+					spk_obj["time"] = t;
+				}
 			}
 		}
 	}

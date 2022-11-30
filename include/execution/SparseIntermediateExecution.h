@@ -4,7 +4,6 @@
 #include "SparseTensor.h"
 #include "Experiment.h"
 #include "SpikeConverter.h"
-#include "dep/ArduinoJson-v6.17.3.h"
 
 class SparseIntermediateExecution {
 
@@ -26,8 +25,6 @@ private:
 	void _process_train_data(AbstractProcess& process, std::vector<std::pair<std::string, SparseTensor<float>>>& data, size_t refresh_interval);
 	void _process_test_data(AbstractProcess& process, std::vector<std::pair<std::string, SparseTensor<float>>>& data);
 	void _process_output(size_t index);
-
-	void _SavePairVector(std::string fileName, std::vector<std::pair<std::string, SparseTensor<float>>> set);
 
 	ExperimentType& _experiment;
 

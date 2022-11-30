@@ -1,5 +1,4 @@
 #include "analysis/SaveOutputJson.h"
-#include <iostream>
 
 using namespace analysis;
 
@@ -20,7 +19,7 @@ void SaveOutputJson::resize(const Shape&) {
 }
 
 void SaveOutputJson::before_train() {
-	_json_train_file.open(_train_filename, std::ios_base::app);
+	_json_train_file.open(_train_filename);
 	_json_train_file << "[";
 	_first_train_sample = true;
 }
@@ -46,7 +45,7 @@ void SaveOutputJson::after_train() {
 }
 
 void SaveOutputJson::before_test() {
-	_json_test_file.open(_test_filename, std::ios_base::app);
+	_json_test_file.open(_test_filename);
 	_json_test_file << "[";
 	_first_test_sample = true;
 }
@@ -74,13 +73,8 @@ void SaveOutputJson::after_test() {
 std::string SaveOutputJson::_to_json_string(const std::string& label, const Tensor<float>& sample) {
     std::string JSON_output = "";
 
-	// Convert tensor of spike times into vector of spikes
-	//std::vector<Spike> spks;
-	//SpikeConverter::to_spike(sample, spks);
-
 	// Create a JSON document that holds the memory of the sample to serialize
-	// 4 bytes for the label + 4 bytes * 4 (for x,y,z,time vars) * n_spks
-	//DynamicJsonDocument doc(JSON_OBJECT_SIZE(4 + 4 * 4 * spks.size()));
+	// 4 bytes for the label + 4 bytes * (n_neurons * 4) // 4 for x,y,z,time variables
 	DynamicJsonDocument doc(JSON_OBJECT_SIZE(4 + 4 * 4 * sample.shape().product()));
 
 	// Create the main object
@@ -92,23 +86,19 @@ std::string SaveOutputJson::_to_json_string(const std::string& label, const Tens
 	// Array containing spikes
 	JsonArray spks_arr = root.createNestedArray("data");
 
-	// Filling it with spike objects
-	//for(Spike spk : spks)
+	// Iterate over the sample to fill spike array
 	size_t width = sample.shape().dim(0);
 	size_t height = sample.shape().dim(1);
 	size_t depth = sample.shape().dim(2);
-
 	for(size_t x=0; x<width; x++) {
 		for(size_t y=0; y<height; y++) {
 			for(size_t z=0; z<depth; z++) {
 				Time t = sample.at(x, y, z);
-				if (t < sample.shape().product()) {
-					JsonObject spk_obj = spks_arr.createNestedObject();
-					spk_obj["x"] = x;
-					spk_obj["y"] = y;
-					spk_obj["z"] = z;
-					spk_obj["time"] = t;
-				}
+				JsonObject spk_obj = spks_arr.createNestedObject();
+				spk_obj["x"] = x;
+				spk_obj["y"] = y;
+				spk_obj["z"] = z;
+				spk_obj["time"] = t;
 			}
 		}
 	}

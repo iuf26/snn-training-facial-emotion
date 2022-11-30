@@ -147,6 +147,7 @@ Tensor<float> WTAOutput::process(const Tensor<Time>& in) {
 
 static RegisterClassParameter<SpikeTiming, OutputConverterFactory> _register_6("SpikeTiming");
 
+// Similar to NoOutputConversion but removes INFINITE_TIME
 SpikeTiming::SpikeTiming() : OutputConverter(_register_6) {
 
 }

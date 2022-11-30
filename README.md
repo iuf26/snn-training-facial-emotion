@@ -20,9 +20,9 @@ Provide implementation of experiments described in:
 
 ## Installation
 
-    mkdir falez-csnn-simulator-build
-    cd falez-csnn-simulator-build
-    cmake ../falez-csnn-simulator -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_GUI=NO
+    mkdir csnn-simulator-build
+    cd csnn-simulator-build
+    cmake ../csnn-simulator -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_GUI=NO
     make
 
 ## Usage

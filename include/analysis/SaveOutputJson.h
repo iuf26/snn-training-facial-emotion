@@ -2,6 +2,7 @@
 #define _ANALYSIS_SAVE_OUTPUT_JSON_H
 
 #include <fstream>
+#include "Spike.h"
 #include "Analysis.h"
 #include "dep/ArduinoJson-v6.17.3.h"
 

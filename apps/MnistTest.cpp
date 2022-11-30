@@ -9,6 +9,7 @@
 #include "execution/SparseIntermediateExecution.h"
 #include "analysis/Svm.h"
 #include "analysis/SaveOutputJson.h"
+#include "analysis/SaveOutput.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
 #include "layer/Pooling.h"
@@ -17,7 +18,6 @@
 #include "process/Pooling.h"
 #include "stdp/Linear.h"
 #include "stdp/BiologicalMultiplicative.h"
-#include "analysis/SaveOutput.h"
 
 int main(int argc, char** argv) {
 	Experiment<SparseIntermediateExecution> experiment(argc, argv, "mnist");
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 	conv1.plot_reconstruction(true);
 #endif
 
-	auto& pool2_save = experiment.output<NoOutputConversion>(pool2, t_obj);
+	auto& pool2_save = experiment.output<NoOutputConversion>(pool2);
 	pool2_save.add_analysis<analysis::SaveOutputJson>("pool2_train.json", "pool2_test.json");
 
 	//auto& fc1_out = experiment.output<TimeObjectiveOutput>(fc1, t_obj);

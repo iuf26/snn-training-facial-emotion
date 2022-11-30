@@ -24,15 +24,14 @@ void DenseIntermediateExecution::process(size_t refresh_interval) {
 		_process_train_data(_experiment.process_at(i), _train_set, refresh_interval);
 		_process_test_data(_experiment.process_at(i), _test_set);
 		// Save output of the last process
-		if (false) {//(i+1 == _experiment.process_number()) {
+		if (i+1 == _experiment.process_number()) {
 			// TEMPORARY
 			// Find a way to add a postprocessing before the output conversion
 			// Save train and test sets into files
-			_SavePairVector(_experiment.process_at(i).class_name() + "_" + std::to_string(i) + "_train.json", _train_set);
-			_SavePairVector(_experiment.process_at(i).class_name() + "_" + std::to_string(i) + "_test.json", _test_set);
+			_SavePairVector(_experiment.process_at(i).class_name() + "_" + std::to_string(i) + "_train_original.json", _train_set);
+			_SavePairVector(_experiment.process_at(i).class_name() + "_" + std::to_string(i) + "_test_original.json", _test_set);
 		}
 		_process_output(i);
-		//_update_data(i, refresh_interval);
 	}
 
 	_train_set.clear();

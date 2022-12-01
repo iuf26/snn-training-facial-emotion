@@ -55,7 +55,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("min_th").set(0.0f); //not specified in the paper Pattern Recognition
 	conv1.parameter<float>("t_obj").set(t_obj);
 	conv1.parameter<float>("lr_th").set(th_lr);
-	conv1.parameter<bool>("wta_infer").set(true); //not implemented in the public version + not specified in the paper Pattern Recognition
+	conv1.parameter<bool>("wta_infer").set(false); //not implemented in the public version + not specified in the paper Pattern Recognition
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(2.0, 0.1); //not as in the paper Pattern Recognition
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);

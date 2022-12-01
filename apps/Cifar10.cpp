@@ -19,7 +19,7 @@
 #include "process/SeparateSign.h"
 
 int main(int argc, char** argv) {
-	Experiment<SparseIntermediateExecution> experiment(argc, argv, "cifar10");
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10");
 
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
 

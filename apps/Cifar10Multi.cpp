@@ -8,6 +8,7 @@
 #include "execution/DenseIntermediateExecution.h"
 #include "execution/SparseIntermediateExecution.h"
 #include "analysis/Svm.h"
+#include "analysis/SaveOutputJson.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
 #include "process/Input.h"
@@ -81,6 +82,11 @@ int main(int argc, char** argv) {
 	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	pool2.set_name("pool2");
 
+	// Save output
+	auto& pool2_save = experiment.output<NoOutputConversion>(pool2);
+	pool2_save.add_analysis<analysis::SaveOutputJson>("pool2_train.json", "pool2_test.json");
+
+	// Evaluate output
 	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
 	pool2_out.add_analysis<analysis::Svm>();
 

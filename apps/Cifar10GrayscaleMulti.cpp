@@ -85,7 +85,6 @@ int main(int argc, char** argv) {
 	// Output analysis
 	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
 	pool2_out.add_analysis<analysis::Activity>();
-	pool2_out.add_analysis<analysis::Coherence>();
 	pool2_out.add_analysis<analysis::Svm>();
 
 #ifdef ENABLE_QT

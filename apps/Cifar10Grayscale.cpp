@@ -62,8 +62,9 @@ int main(int argc, char** argv) {
 
 	// Save conv1 output
 	// IMPOSSIBLE BECAUSE TOO BIG
-	//auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
-	//conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
+	auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
+	conv1_save.add_analysis<analysis::Activity>();
+	conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
 
 	// Save mean pool1 output
 	auto& pool1_save = experiment.output<SpikeTiming>(conv1);

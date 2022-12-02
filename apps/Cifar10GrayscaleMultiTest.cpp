@@ -78,10 +78,16 @@ int main(int argc, char** argv) {
 	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	pool2.set_name("pool2");
 
-	// Analysis
-	// Count the number of active untis
 	auto& conv1_anal = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_anal.add_analysis<analysis::Activity>();
+
+	auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
+	conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
+
+	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
+	conv1_out.add_postprocessing<process::FeatureScaling>();
+	conv1_out.add_analysis<analysis::Svm>();
 
 	auto& conv2_out = experiment.output<DefaultOutput>(conv2, 0.0, 1.0);
 	conv2_out.add_postprocessing<process::SumPooling>(2, 2);

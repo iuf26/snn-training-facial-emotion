@@ -35,7 +35,7 @@ include_directories(include/ ${LAPACK_INCLUDES})
 
 
 set(APPS_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -ansi -pedantic -Wshadow -Weffc++ -ftemplate-backtrace-limit=0  -msse -msse2 -msse3 -march=native -mfpmath=sse")
-add_definitions(-DSMID_AVX256)
+#add_definitions(-DSMID_AVX256)
 
 add_subdirectory(dep/libsvm)
 

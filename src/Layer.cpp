@@ -80,6 +80,8 @@ Shape Layer3D::compute_shape(const Shape& previous_shape) {
 	return Shape({_width, _height, _depth});
 }
 
+// Search for output neurons integrating input of position (x_in, y_in)
+// For each involved output neuron, we get the position of the input in its window (i.e. the weight modulating the input)
 void Layer3D::forward(uint16_t x_in, uint16_t y_in, std::vector<std::tuple<uint16_t, uint16_t, uint16_t, uint16_t>>& output) {
 	size_t s_x = x_in+_padding_x >= _filter_width-_stride_x ? (x_in+_padding_x-(_filter_width-_stride_x))/_stride_x : 0;
 	size_t s_y = y_in+_padding_y >= _filter_height-_stride_y ? (y_in+_padding_y-(_filter_height-_stride_y))/_stride_y : 0;

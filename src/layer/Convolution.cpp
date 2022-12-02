@@ -520,29 +520,40 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 
 	for(const Spike& spike : input_spike) {
 
+		// Get the spatial position of output neurons integrating inputs coming from the spatial position of the input spike
+		// NOTE : output_spikes should be called output_pos_to_process
 		std::vector<std::tuple<uint16_t, uint16_t, uint16_t, uint16_t>> output_spikes;
 		_model.forward(spike.x, spike.y, output_spikes);
 
+		// Iterate over output neuron spatial positions 
 		for(const auto& entry : output_spikes) {
 			uint16_t x = std::get<0>(entry);
 			uint16_t y = std::get<1>(entry);
 			uint16_t w_x = std::get<2>(entry);
 			uint16_t w_y = std::get<3>(entry);
 
+			// WTA inhibition : one spike per spatial position
 			if(_model._wta_infer && _wta.at(x, y)) {
 				continue;
 			}
 
+			// Iterate over channels (<=> output neuron at the given spatial position)
 			for(size_t z=0; z<depth; z++) {
-
-				if(_inh.at(x, y, z)) {
+				
+				// Single spike inhibition : one spike per neuron
+				if(_inh.at(x, y, z) || (_model._wta_infer && _wta.at(x, y))) {
 					continue;
 				}
 
+				// Update the membrane potential of the output neuron 
+				// with the weight associated to the input neuron 
 				_a.at(x, y, z) += w.at(w_x, w_y, spike.z, z);
+				// When the membrane potential reaches the threshold of the channel
 				if(_a.at(x, y, z) >= th.at(z)) {
 					_wta.at(x, y) = true;
+					// Add a spike to the output vector
 					output_spike.emplace_back(spike.time, x, y, z);
+					// Deactivate the neuron
 					_inh.at(x, y, z) = true;
 				}
 			}

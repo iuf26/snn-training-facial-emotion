@@ -55,20 +55,21 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("min_th").set(0.0f); //not specified in the paper Pattern Recognition
 	conv1.parameter<float>("t_obj").set(t_obj);
 	conv1.parameter<float>("lr_th").set(th_lr);
-	conv1.parameter<bool>("wta_infer").set(false); //not implemented in the public version + not specified in the paper Pattern Recognition
+	conv1.parameter<bool>("wta_infer").set(true); //not implemented in the public version + not specified in the paper Pattern Recognition
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(2.0, 0.1); //not as in the paper Pattern Recognition
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
 	// Save conv1 output
 	// IMPOSSIBLE BECAUSE TOO BIG
-	//auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
+	auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
+	conv1_save.add_analysis<analysis::Activity>();
 	//conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
 
 	// Save mean pool1 output
-	auto& pool1_save = experiment.output<SpikeTiming>(conv1);
-	pool1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
+	//auto& pool1_save = experiment.output<SpikeTiming>(conv1);
+	//pool1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	//pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// Output analysis
 	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);

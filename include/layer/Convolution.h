@@ -43,6 +43,7 @@ private:
 	Convolution& _model;
 	Tensor<float> _a;
 	Tensor<bool> _inh;
+	Tensor<bool> _wta;
 };
 #endif
 }

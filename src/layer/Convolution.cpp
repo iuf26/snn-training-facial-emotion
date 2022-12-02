@@ -456,13 +456,14 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 }
 
 #else
-_priv::ConvolutionImpl::ConvolutionImpl(Convolution& model) : _model(model), _a(), _inh() {
+_priv::ConvolutionImpl::ConvolutionImpl(Convolution& model) : _model(model), _a(), _inh(), _wta() {
 
 }
 
 void _priv::ConvolutionImpl::resize() {
 	_a = Tensor<float>(Shape({_model.width(), _model.height(), _model.depth()}));
 	_inh = Tensor<bool>(Shape({_model.width(), _model.height(), _model.depth()}));
+	_wta = Tensor<bool>(Shape({_model.width(), _model.height()}));
 }
 
 void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const Tensor<Time>& input_time, std::vector<Spike>& output_spike) {
@@ -513,6 +514,10 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 	std::fill(std::begin(_a), std::end(_a), 0);
 	std::fill(std::begin(_inh), std::end(_inh), false);
 
+	if(_model._wta_infer) {
+		_wta.fill(false);
+	}
+
 	for(const Spike& spike : input_spike) {
 
 		std::vector<std::tuple<uint16_t, uint16_t, uint16_t, uint16_t>> output_spikes;
@@ -524,6 +529,9 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 			uint16_t w_x = std::get<2>(entry);
 			uint16_t w_y = std::get<3>(entry);
 
+			if(_model._wta_infer && _wta.at(x, y)) {
+				continue;
+			}
 
 			for(size_t z=0; z<depth; z++) {
 
@@ -533,6 +541,7 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 
 				_a.at(x, y, z) += w.at(w_x, w_y, spike.z, z);
 				if(_a.at(x, y, z) >= th.at(z)) {
+					_wta.at(x, y) = true;
 					output_spike.emplace_back(spike.time, x, y, z);
 					_inh.at(x, y, z) = true;
 				}

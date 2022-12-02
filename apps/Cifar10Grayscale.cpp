@@ -66,16 +66,14 @@ int main(int argc, char** argv) {
 	//conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
 
 	// Save mean pool1 output
-	auto& pool1_save = experiment.output<SpikeTiming>(conv1);
-	pool1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
+	//auto& pool1_save = experiment.output<SpikeTiming>(conv1);
+	//pool1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	//pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// Output analysis
 	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
 	conv1_out.add_postprocessing<process::FeatureScaling>();
-	conv1_out.add_analysis<analysis::Activity>();
-	conv1_out.add_analysis<analysis::Coherence>();
 	conv1_out.add_analysis<analysis::Svm>();
 
 #ifdef ENABLE_QT

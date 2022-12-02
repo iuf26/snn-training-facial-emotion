@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("min_th").set(4.0f);
 	conv1.parameter<float>("t_obj").set(t_obj);
 	conv1.parameter<float>("lr_th").set(th_lr);
-	conv1.parameter<bool>("wta_infer").set(true);
+	conv1.parameter<bool>("wta_infer").set(false);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1.0);

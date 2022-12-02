@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 		input_path+"test_batch.bin"
 	}));
 
-	float t_obj = 0.97f;
+	float t_obj = 0.95f;
 	float th_lr = 1.0f;
 	float w_lr = 0.1f;
 
@@ -52,35 +52,32 @@ int main(int argc, char** argv) {
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(100);
 	conv1.parameter<float>("annealing").set(1.0f); //not specified in the paper Pattern Recognition
-	conv1.parameter<float>("min_th").set(5.0f); //not specified in the paper Pattern Recognition
+	conv1.parameter<float>("min_th").set(4.0f); //not specified in the paper Pattern Recognition
 	conv1.parameter<float>("t_obj").set(t_obj);
 	conv1.parameter<float>("lr_th").set(th_lr);
 	conv1.parameter<bool>("wta_infer").set(false); //not implemented in the public version + not specified in the paper Pattern Recognition
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(20.0, 0.1); //not as in the paper Pattern Recognition
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1); //not as in the paper Pattern Recognition
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
 	auto& pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	pool1.set_name("pool1");
 
-	// Save conv1 output
-	// IMPOSSIBLE BECAUSE TOO BIG
-	//auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
-	//conv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
+	// Analysis
+	// Count the number of active untis
+	auto& conv1_anal = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_anal.add_analysis<analysis::Activity>();
 
-	// Save mean pool1 output
-	//auto& pool1_save = experiment.output<SpikeTiming>(conv1);
-	//pool1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	//pool1_save.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
-
-	// Output analysis
+	// Classification
+	// Evaluate the features learned
 	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
 	conv1_out.add_postprocessing<process::FeatureScaling>();
-	conv1_out.add_analysis<analysis::Activity>();
 	conv1_out.add_analysis<analysis::Svm>();
 
+	// Same thing with pool1
 	auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	conv1_anal.add_analysis<analysis::Activity>();
 	pool1_out.add_analysis<analysis::Svm>();
 
 #ifdef ENABLE_QT

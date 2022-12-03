@@ -51,13 +51,13 @@ int main(int argc, char** argv) {
 	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(100);
-	conv1.parameter<float>("annealing").set(1.0f); //not specified in the paper Pattern Recognition
-	conv1.parameter<float>("min_th").set(4.0f); //not specified in the paper Pattern Recognition
+	conv1.parameter<float>("annealing").set(0.95f); //not specified in the paper Pattern Recognition
+	conv1.parameter<float>("min_th").set(2.0f); //not specified in the paper Pattern Recognition
 	conv1.parameter<float>("t_obj").set(t_obj);
 	conv1.parameter<float>("lr_th").set(th_lr);
 	conv1.parameter<bool>("wta_infer").set(false); //not implemented in the public version + not specified in the paper Pattern Recognition
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1); //not as in the paper Pattern Recognition
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(8.0, 0.1); //not as in the paper Pattern Recognition
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
 	auto& pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
@@ -66,13 +66,13 @@ int main(int argc, char** argv) {
 	auto& conv2 = experiment.push<layer::Convolution>(5, 5, 128);
 	conv2.set_name("conv2");
 	conv2.parameter<uint32_t>("epoch").set(100);
-	conv2.parameter<float>("annealing").set(1.0f);
-	conv2.parameter<float>("min_th").set(6.0f);
+	conv2.parameter<float>("annealing").set(0.95f);
+	conv2.parameter<float>("min_th").set(4.0f);
 	conv2.parameter<float>("t_obj").set(t_obj);
 	conv2.parameter<float>("lr_th").set(th_lr);
 	conv2.parameter<bool>("wta_infer").set(false);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(14.0, 0.1);
+	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
 	conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
 	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);

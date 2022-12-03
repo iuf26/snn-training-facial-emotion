@@ -67,12 +67,12 @@ int main(int argc, char** argv) {
 	conv2.set_name("conv2");
 	conv2.parameter<uint32_t>("epoch").set(100);
 	conv2.parameter<float>("annealing").set(0.95f);
-	conv2.parameter<float>("min_th").set(4.0f);
+	conv2.parameter<float>("min_th").set(2.0f);
 	conv2.parameter<float>("t_obj").set(t_obj);
 	conv2.parameter<float>("lr_th").set(th_lr);
 	conv2.parameter<bool>("wta_infer").set(false);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
+	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(8.0, 0.1);
 	conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 1);
 
 	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
@@ -84,10 +84,10 @@ int main(int argc, char** argv) {
 	//auto& conv1_save = experiment.output<NoOutputConversion>(conv1);
 	//onv1_save.add_analysis<analysis::SaveOutputJson>("conv1_train.json", "conv1_test.json");
 
-	//auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
-	//conv1_out.add_postprocessing<process::SumPooling>(2, 2);
-	//conv1_out.add_postprocessing<process::FeatureScaling>();
-	//conv1_out.add_analysis<analysis::Svm>();
+	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
+	conv1_out.add_postprocessing<process::FeatureScaling>();
+	conv1_out.add_analysis<analysis::Svm>();
 
 	auto& conv2_out = experiment.output<DefaultOutput>(conv2, 0.0, 1.0);
 	conv2_out.add_postprocessing<process::SumPooling>(2, 2);

@@ -59,16 +59,16 @@ int main(int argc, char** argv) {
 	auto& pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	pool1.set_name("pool1");
 
-	auto& conv2 = experiment.push<layer::Convolution>(5, 5, 128);
+	auto& conv2 = experiment.push<layer::Convolution>(3, 3, 128);
 	conv2.set_name("conv2");
 	conv2.parameter<uint32_t>("epoch").set(200);
 	conv2.parameter<float>("annealing").set(0.99);
-	conv2.parameter<float>("min_th").set(4.0f);
-	conv2.parameter<float>("t_obj").set(0.95);
+	conv2.parameter<float>("min_th").set(3.0f);
+	conv2.parameter<float>("t_obj").set(0.9);
 	conv2.parameter<float>("lr_th").set(0.1);
 	conv2.parameter<bool>("wta_infer").set(false);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(8.0, 0.1);
+	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(6.0, 0.1);
 	conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
 
 	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);

@@ -17,7 +17,7 @@
 #include "process/OnOffFilter.h"
 
 int main(int argc, char** argv) {
-	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10Test1");
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10Test2");
 
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
 
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 	conv2.parameter<uint32_t>("epoch").set(200);
 	conv2.parameter<float>("annealing").set(0.99);
 	conv2.parameter<float>("min_th").set(4.0f);
-	conv2.parameter<float>("t_obj").set(0.85);
+	conv2.parameter<float>("t_obj").set(0.95);
 	conv2.parameter<float>("lr_th").set(0.1);
 	conv2.parameter<bool>("wta_infer").set(false);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);

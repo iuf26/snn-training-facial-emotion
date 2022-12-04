@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("annealing").set(0.99); //not specified in the paper Pattern Recognition
 	conv1.parameter<float>("min_th").set(2.0); //not specified in the paper Pattern Recognition
 	conv1.parameter<float>("t_obj").set(0.9);
-	conv1.parameter<float>("lr_th").set(1.0);
+	conv1.parameter<float>("lr_th").set(0.0);
 	conv1.parameter<bool>("wta_infer").set(false); //not implemented in the public version + not specified in the paper Pattern Recognition
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(5.0, 0.1); //not as in the paper Pattern Recognition
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 	conv2.parameter<float>("annealing").set(0.99);
 	conv2.parameter<float>("min_th").set(4.0f);
 	conv2.parameter<float>("t_obj").set(0.9);
-	conv2.parameter<float>("lr_th").set(1.0);
+	conv2.parameter<float>("lr_th").set(0.0);
 	conv2.parameter<bool>("wta_infer").set(false);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(8.0, 0.1);

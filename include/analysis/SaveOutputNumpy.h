@@ -7,7 +7,7 @@
 
 namespace analysis {
 
-	class SaveOutputNumpy : public TwoPassAnalysis {
+	class SaveOutputNumpy : public UniquePassAnalysis {
 
 	public:
 		SaveOutputNumpy();
@@ -26,8 +26,13 @@ namespace analysis {
 		void after_test();
 
 	private:
+		void _TensorToVector(const Tensor<float>& in, std::vector<float>& out);
+
 		std::string _train_filename;
 		std::string _test_filename;
+
+		std::vector<std::vector<float>> _data_train;
+		std::vector<std::vector<float>> _data_test;
 	};
 
 }

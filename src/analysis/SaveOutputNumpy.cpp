@@ -1,11 +1,16 @@
 #include "analysis/SaveOutputNumpy.h"
+#include<complex>
+#include<cstdlib>
+#include<iostream>
+#include<map>
+#include<string>
 
 using namespace analysis;
 
 static RegisterClassParameter<SaveOutputNumpy, AnalysisFactory> _register("SaveOutputNumpy");
 
 SaveOutputNumpy::SaveOutputNumpy() : UniquePassAnalysis(_register),
-	_train_filename(), _test_filename() {
+	_train_filename(), _test_filename(), _data_train(), _data_test() {
 	throw std::runtime_error("Unimplemented");
 }
 

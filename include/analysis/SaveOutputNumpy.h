@@ -33,8 +33,11 @@ namespace analysis {
 		std::vector<float> _data_train;
 		std::vector<float> _data_test;
 
-		int _train_sample_cnt;
-		int _test_sample_cnt;
+		long unsigned _train_sample_cnt;
+		long unsigned _test_sample_cnt;
+		long unsigned _width;
+		long unsigned _height;
+		long unsigned _depth;	
 	};
 
 }

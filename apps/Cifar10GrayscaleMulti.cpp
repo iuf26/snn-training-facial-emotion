@@ -7,6 +7,7 @@
 #include "Distribution.h"
 #include "execution/DenseIntermediateExecution.h"
 #include "analysis/Svm.h"
+#include "analysis/SaveOutputJson.h"
 #include "analysis/SaveOutputNumpy.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
@@ -83,6 +84,10 @@ int main(int argc, char** argv) {
 	auto& conv1_save = experiment.output<SpikeTiming>(conv1);
 	conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
 	conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool_conv1_train.npy", "meanPool_conv1_test.npy");
+
+	auto& conv1_save2 = experiment.output<SpikeTiming>(conv1);
+	conv1_save2.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	conv1_save2.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// conv1 : Activity
 	auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);

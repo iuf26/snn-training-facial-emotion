@@ -498,13 +498,13 @@ SaveArrayAsNumpy(const std::string &filename, bool fortran_order, unsigned int n
   if (!stream) {
     throw std::runtime_error("io error: failed to open a file.");
   }
-  std::cout<<1<<std::endl;
+
   std::vector <ndarray_len_t> shape_v(shape, shape + n_dims);
   header_t header{dtype, fortran_order, shape_v};
   write_header(stream, header);
   
   auto size = static_cast<size_t>(comp_size(shape_v));
-  std::cout<<2<<std::endl;
+
   stream.write(reinterpret_cast<const char *>(data), sizeof(Scalar) * size);
 }
 

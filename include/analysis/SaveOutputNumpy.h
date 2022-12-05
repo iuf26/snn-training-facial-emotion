@@ -32,8 +32,8 @@ namespace analysis {
 		std::vector<float> _data_train;
 		std::vector<float> _data_test;
 	
-		std::vector<std::string> _label_train;
-		std::vector<std::string> _label_test;
+		std::vector<int> _label_train;
+		std::vector<int> _label_test;
 
 		long unsigned _train_sample_cnt;
 		long unsigned _test_sample_cnt;

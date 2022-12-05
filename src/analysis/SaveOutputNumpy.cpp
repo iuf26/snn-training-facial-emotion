@@ -1,7 +1,6 @@
 #include "analysis/SaveOutputNumpy.h"
 
 using namespace analysis;
-#include <iostream>
 
 static RegisterClassParameter<SaveOutputNumpy, AnalysisFactory> _register("SaveOutputNumpy");
 
@@ -39,7 +38,7 @@ void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float
             }
         }
     }
-    _label_train.emplace_back(label);
+    _label_train.emplace_back(std::stoi(label));
     _train_sample_cnt += 1;
 }
 
@@ -47,15 +46,9 @@ void SaveOutputNumpy::after_train() {
     const bool fortran_order{false};
     
     const std::vector<long unsigned> shape_data{_train_sample_cnt, _width, _height, _depth};
-    const std::vector<long unsigned> shape_label{_train_sample_cnt, 1};
+    const std::vector<long unsigned> shape_label{_train_sample_cnt};
 
     npy::SaveArrayAsNumpy(_file_prefix + "_data_train.npy", fortran_order, shape_data.size(), shape_data.data(), _data_train);
-    std::cout<<_label_train.size()<<std::endl;
-    std::cout<<_train_sample_cnt<<std::endl;
-    std::cout<<_label_train[0]<<std::endl;
-    std::cout<<_label_train[1]<<std::endl;
-    std::cout<<shape_label.size()<<std::endl;
-    std::cout<<shape_label.data()<<std::endl;
     npy::SaveArrayAsNumpy(_file_prefix + "_label_train.npy", fortran_order, shape_label.size(), shape_label.data(), _label_train);
 }
 
@@ -77,7 +70,7 @@ void SaveOutputNumpy::process_test(const std::string& label, const Tensor<float>
             }
         }
     }
-    _label_test.emplace_back(label);
+    _label_test.emplace_back(std::stoi(label));
     _test_sample_cnt += 1;
 }
 

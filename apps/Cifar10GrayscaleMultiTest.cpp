@@ -82,7 +82,11 @@ int main(int argc, char** argv) {
 	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
 	conv1_out.add_postprocessing<process::FeatureScaling>();
-	conv1_out.add_analysis<analysis::Svm>();
+	//conv1_out.add_analysis<analysis::Svm>();
+
+	// Save mean pool1 output
+	auto& pool1_save = experiment.output<NoOutputConversion>(pool1);
+	pool1_save.add_analysis<analysis::SaveOutputJson>("pool1_train.json", "pool1_test.json");
 
 	// Activity after conv2
 	auto& conv2_anal = experiment.output<DefaultOutput>(conv2, 0.0, 1.0);

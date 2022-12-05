@@ -3,7 +3,7 @@
 
 #include<iostream>
 #include "Analysis.h"
-#include"include/npy.h"
+#include"include/npy.hpp"
 
 namespace analysis {
 

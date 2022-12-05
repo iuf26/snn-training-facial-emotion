@@ -31,7 +31,7 @@ void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float
 	for(size_t x=0; x<width; x++) {
 		for(size_t y=0; y<height; y++) {
 			for(size_t z=0; z<depth; z++) {
-                _data_tain.emplace_back(sample.at(x, y, z));
+                _data_teain.emplace_back(sample.at(x, y, z));
             }
         }
     }
@@ -39,8 +39,7 @@ void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float
 }
 
 void SaveOutputNumpy::after_train() {
-    int n_neurons = std::static_cast<int>(_data_train.size()/_train_sample_cnt);
-    const std::vector<long unsigned> shape{_train_sample_cnt, n_neurons};
+    const std::vector<long unsigned> shape{_train_sample_cnt, _data_train.size()/_train_sample_cnt};
     const bool fortran_order{false};
     npy::SaveArrayAsNumpy(_train_filename, fortran_order, shape.size(), shape.data(), _data_train);
 }
@@ -66,8 +65,7 @@ void SaveOutputNumpy::process_test(const std::string& label, const Tensor<float>
 }
 
 void SaveOutputNumpy::after_test() {
-    int n_neurons = std::static_cast<int>(_data_test.size()/_test_sample_cnt);
-    const std::vector<long unsigned> shape{_test_sample_cnt, n_neurons};
+    const std::vector<long unsigned> shape{_test_sample_cnt, _data_test.size()/_test_sample_cnt};
     const bool fortran_order{false};
     npy::SaveArrayAsNumpy(_test_filename, fortran_order, shape.size(), shape.data(), _data_test);
 }

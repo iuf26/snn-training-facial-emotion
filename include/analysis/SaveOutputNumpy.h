@@ -3,7 +3,7 @@
 
 #include<iostream>
 #include "Analysis.h"
-#include"dep/cnpy/cnpy.h"
+#include"include/npy.h"
 
 namespace analysis {
 
@@ -26,13 +26,12 @@ namespace analysis {
 		void after_test();
 
 	private:
-		void _TensorToVector(const Tensor<float>& in, std::vector<float>& out);
 
 		std::string _train_filename;
 		std::string _test_filename;
 
-		std::vector<std::vector<float>> _data_train;
-		std::vector<std::vector<float>> _data_test;
+		std::vector<float> _data_train;
+		std::vector<float> _data_test;
 	};
 
 }

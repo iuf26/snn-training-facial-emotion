@@ -8,6 +8,7 @@
 #include "execution/DenseIntermediateExecution.h"
 #include "analysis/Svm.h"
 #include "analysis/SaveOutputNumpy.h"
+#include "analysis/SaveOutputJson.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
 #include "process/Input.h"
@@ -82,7 +83,11 @@ int main(int argc, char** argv) {
 	// conv1 : Save features
 	auto& conv1_save = experiment.output<SpikeTiming>(conv1);
 	conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool_conv1_train.npy", "meanPool_conv1_test.npy");
+	conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool_conv1");
+
+	auto& conv1_save2 = experiment.output<SpikeTiming>(conv1);
+	conv1_save2.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	conv1_save2.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// conv1 : Activity
 	auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
@@ -96,7 +101,7 @@ int main(int argc, char** argv) {
 
 	// pool1 : Save features
 	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_train.npy", "pool1_test.npy");
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1");
 
 	// pool1 : Activity
 	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
@@ -109,7 +114,7 @@ int main(int argc, char** argv) {
 
 	// pool2 : Save features
 	auto& pool2_save = experiment.output<SpikeTiming>(pool2);
-	pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2_train.npy", "pool2_test.npy");
+	pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
 
 	// pool2 : Activity
 	auto& pool2_activity = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);

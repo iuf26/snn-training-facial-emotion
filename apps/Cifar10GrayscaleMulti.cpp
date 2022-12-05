@@ -7,7 +7,6 @@
 #include "Distribution.h"
 #include "execution/DenseIntermediateExecution.h"
 #include "analysis/Svm.h"
-#include "analysis/SaveOutputJson.h"
 #include "analysis/SaveOutputNumpy.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
@@ -51,7 +50,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("annealing").set(0.99);
 	conv1.parameter<float>("min_th").set(2.0);
 	conv1.parameter<float>("t_obj").set(0.9);
-	conv1.parameter<float>("lr_th").set(0.5);
+	conv1.parameter<float>("lr_th").set(0.1);
 	conv1.parameter<bool>("wta_infer").set(false);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(5.0, 0.1);
@@ -66,7 +65,7 @@ int main(int argc, char** argv) {
 	conv2.parameter<float>("annealing").set(0.99);
 	conv2.parameter<float>("min_th").set(3.0);
 	conv2.parameter<float>("t_obj").set(0.8);
-	conv2.parameter<float>("lr_th").set(0.5);
+	conv2.parameter<float>("lr_th").set(0.1);
 	conv2.parameter<bool>("wta_infer").set(false);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(6.0, 0.1);
@@ -84,10 +83,6 @@ int main(int argc, char** argv) {
 	auto& conv1_save = experiment.output<SpikeTiming>(conv1);
 	conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
 	conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool_conv1_train.npy", "meanPool_conv1_test.npy");
-
-	auto& conv1_save2 = experiment.output<SpikeTiming>(conv1);
-	conv1_save2.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	conv1_save2.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// conv1 : Activity
 	auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);

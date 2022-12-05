@@ -31,7 +31,7 @@ void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float
 	for(size_t x=0; x<width; x++) {
 		for(size_t y=0; y<height; y++) {
 			for(size_t z=0; z<depth; z++) {
-                _data_teain.emplace_back(sample.at(x, y, z));
+                _data_train.emplace_back(sample.at(x, y, z));
             }
         }
     }

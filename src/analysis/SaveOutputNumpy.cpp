@@ -54,6 +54,8 @@ void SaveOutputNumpy::after_train() {
     std::cout<<_train_sample_cnt<<std::endl;
     std::cout<<_label_train[0]<<std::endl;
     std::cout<<_label_train[1]<<std::endl;
+    std::cout<<shape_label.size()<<std::endl;
+    std::cout<<shape_label.data()<<std::endl;
     npy::SaveArrayAsNumpy(_file_prefix + "_label_train.npy", fortran_order, shape_label.size(), shape_label.data(), _label_train);
 }
 

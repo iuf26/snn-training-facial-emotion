@@ -19,7 +19,7 @@
 #include "analysis/SaveOutputNumpy.h"
 
 int main(int argc, char** argv) {
-	Experiment<SparseIntermediateExecution> experiment(argc, argv, "mnist");
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, "mnist");
 
 	experiment.push<process::DefaultOnOffFilter>(7, 1.0, 4.0);
 	experiment.push<process::FeatureScaling>();
@@ -83,29 +83,21 @@ int main(int argc, char** argv) {
 	//fc1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	//fc1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
 	//fc1.parameter<STDP>("stdp").set<stdp::Biological>(w_lr, 0.1f);
-	
 
-#ifdef ENABLE_QT
-	conv1.plot_threshold(true);
-	conv1.plot_reconstruction(true);
-#endif
 
 	auto& conv1_out = experiment.output<TimeObjectiveOutput>(conv1, t_obj);
 	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
 	conv1_out.add_postprocessing<process::FeatureScaling>();
 	conv1_out.add_analysis<analysis::Activity>();
 	conv1_out.add_analysis<analysis::Coherence>();
-	//conv1_out.add_analysis<analysis::Svm>();
+	conv1_out.add_analysis<analysis::Svm>();
 
 	auto& conv2_out = experiment.output<TimeObjectiveOutput>(conv2, t_obj);
 	conv2_out.add_postprocessing<process::SumPooling>(2, 2);
 	conv2_out.add_postprocessing<process::FeatureScaling>();
 	conv2_out.add_analysis<analysis::Activity>();
 	conv2_out.add_analysis<analysis::Coherence>();
-	//conv2_out.add_analysis<analysis::Svm>();
-
-	auto& pool2_out1 = experiment.output<SpikeTiming>(pool2);
-	pool2_out1.add_analysis<analysis::SaveOutputNumpy>("pool2");
+	conv2_out.add_analysis<analysis::Svm>();
 
 	auto& pool2_out = experiment.output<TimeObjectiveOutput>(pool2, t_obj);
 	pool2_out.add_postprocessing<process::FeatureScaling>();

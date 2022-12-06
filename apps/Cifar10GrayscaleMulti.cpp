@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(5.0, 0.1);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
 
-	auto& pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
+	auto& pool1 = experiment.push<layer::Pooling>(5, 5, 5, 5);
 	pool1.set_name("pool1");
 
 	auto& conv2 = experiment.push<layer::Convolution>(3, 3, 128);
@@ -81,23 +81,23 @@ int main(int argc, char** argv) {
 	///////////////////////////////
 
 	// conv1 : Save features
-	auto& conv1_save = experiment.output<SpikeTiming>(conv1);
-	conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool_conv1");
+	//auto& conv1_save = experiment.output<SpikeTiming>(conv1);
+	//conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	//conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool_conv1");
 
-	auto& conv1_save2 = experiment.output<SpikeTiming>(conv1);
-	conv1_save2.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	conv1_save2.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
+	//auto& conv1_save2 = experiment.output<SpikeTiming>(conv1);
+	//conv1_save2.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	//conv1_save2.add_analysis<analysis::SaveOutputJson>("meanPool_conv1_train.json", "meanPool_conv1_test.json");
 
 	// conv1 : Activity
-	auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
-	conv1_analysis.add_analysis<analysis::Activity>();
+	//auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	//conv1_analysis.add_analysis<analysis::Activity>();
 
 	// conv1 : SVM evaluation
-	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
-	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
-	conv1_out.add_postprocessing<process::FeatureScaling>();
-	conv1_out.add_analysis<analysis::Svm>();
+	//auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	//conv1_out.add_postprocessing<process::SumPooling>(2, 2);
+	//conv1_out.add_postprocessing<process::FeatureScaling>();
+	//conv1_out.add_analysis<analysis::Svm>();
 
 	// pool1 : Save features
 	auto& pool1_save = experiment.output<SpikeTiming>(pool1);

@@ -1,4 +1,5 @@
 #include "analysis/SaveOutputNumpy.h"
+#include <iostream>
 
 using namespace analysis;
 
@@ -34,6 +35,7 @@ void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float
 	for(size_t x=0; x<_width; x++) {
 		for(size_t y=0; y<_height; y++) {
 			for(size_t z=0; z<_depth; z++) {
+                std::cout<<sample.at(x, y, z)<<std::endl;
                 _data_train.emplace_back(sample.at(x, y, z));
             }
         }

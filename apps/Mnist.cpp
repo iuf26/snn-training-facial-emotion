@@ -16,7 +16,7 @@
 #include "process/Pooling.h"
 #include "stdp/Linear.h"
 #include "stdp/BiologicalMultiplicative.h"
-#include "analysis/SaveOutput.h"
+#include "analysis/SaveOutputNumpy.h"
 
 int main(int argc, char** argv) {
 	Experiment<SparseIntermediateExecution> experiment(argc, argv, "mnist");
@@ -95,14 +95,17 @@ int main(int argc, char** argv) {
 	conv1_out.add_postprocessing<process::FeatureScaling>();
 	conv1_out.add_analysis<analysis::Activity>();
 	conv1_out.add_analysis<analysis::Coherence>();
-	conv1_out.add_analysis<analysis::Svm>();
+	//conv1_out.add_analysis<analysis::Svm>();
 
 	auto& conv2_out = experiment.output<TimeObjectiveOutput>(conv2, t_obj);
 	conv2_out.add_postprocessing<process::SumPooling>(2, 2);
 	conv2_out.add_postprocessing<process::FeatureScaling>();
 	conv2_out.add_analysis<analysis::Activity>();
 	conv2_out.add_analysis<analysis::Coherence>();
-	conv2_out.add_analysis<analysis::Svm>();
+	//conv2_out.add_analysis<analysis::Svm>();
+
+	auto& pool2_out1 = experiment.output<SpikeTiming>(pool2);
+	pool2_out1.add_analysis<analysis::SaveOutputNumpy>("pool2");
 
 	auto& pool2_out = experiment.output<TimeObjectiveOutput>(pool2, t_obj);
 	pool2_out.add_postprocessing<process::FeatureScaling>();

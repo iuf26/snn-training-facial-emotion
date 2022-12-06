@@ -8,7 +8,6 @@
 #include "execution/DenseIntermediateExecution.h"
 #include "analysis/Svm.h"
 #include "analysis/SaveOutputNumpy.h"
-#include "analysis/SaveOutputJson.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
 #include "process/Input.h"

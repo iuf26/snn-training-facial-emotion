@@ -17,7 +17,7 @@
 #include "process/OnOffFilter.h"
 
 int main(int argc, char** argv) {
-	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10gs_pool2_3x3");
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10gs_pool1_4x4");
 
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
 
@@ -56,45 +56,29 @@ int main(int argc, char** argv) {
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(5.0, 0.1);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
 
-	auto& pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
+	auto& pool1 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool1.set_name("pool1");
-
-	auto& conv2 = experiment.push<layer::Convolution>(3, 3, 128);
-	conv2.set_name("conv2");
-	conv2.parameter<uint32_t>("epoch").set(200);
-	conv2.parameter<float>("annealing").set(0.99);
-	conv2.parameter<float>("min_th").set(3.0);
-	conv2.parameter<float>("t_obj").set(0.8);
-	conv2.parameter<float>("lr_th").set(0.1);
-	conv2.parameter<bool>("wta_infer").set(false);
-	conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(6.0, 0.1);
-	conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
-
-	auto& pool2 = experiment.push<layer::Pooling>(3, 3, 3, 3);
-	pool2.set_name("pool2");
-
 	
 	///////////////////////////////
 	/////////// OUTPUTS ///////////
 	///////////////////////////////
 
-	// pool2 : Save features
-	auto& pool2_save = experiment.output<SpikeTiming>(pool2);
-	pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
+	// pool1 : Save features
+	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
 
-	// pool2 : Activity
-	auto& pool2_activity = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_activity.add_analysis<analysis::Activity>();
+	// pool1 : Activity
+	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	pool1_activity.add_analysis<analysis::Activity>();
 
-	// pool2 : SVM evaluation
-	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_out.add_postprocessing<process::SumPooling>(2, 2);
-	pool2_out.add_postprocessing<process::FeatureScaling>();
-	pool2_out.add_analysis<analysis::Svm>();
+	// pool1 : SVM evaluation
+	auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	pool1_out.add_postprocessing<process::SumPooling>(2, 2);
+	pool1_out.add_postprocessing<process::FeatureScaling>();
+	pool1_out.add_analysis<analysis::Svm>();
 
-	auto& pool2_out2 = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_out2.add_analysis<analysis::Svm>();
+	auto& pool1_out2 = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	pool1_out2.add_analysis<analysis::Svm>();
 
 	experiment.run(10000);
 }

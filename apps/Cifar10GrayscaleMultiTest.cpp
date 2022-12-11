@@ -80,8 +80,8 @@ int main(int argc, char** argv) {
 	///////////////////////////////
 
 	// pool2 : Save features
-	auto& pool2_save = experiment.output<SpikeTiming>(pool2);
-	pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
+	//auto& pool2_save = experiment.output<SpikeTiming>(pool2);
+	//pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2_3x3");
 
 	// pool2 : Activity
 	auto& pool2_activity = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);

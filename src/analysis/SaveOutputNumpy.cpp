@@ -48,7 +48,7 @@ void SaveOutputNumpy::after_train() {
     const std::vector<long unsigned> shape_data{_train_sample_cnt, _width, _height, _depth};
     const std::vector<long unsigned> shape_label{_train_sample_cnt};
 
-    npy::SaveArrayAsNumpy(_file_prefix + "_data_train.npy", fortran_order, shape_data.size(), shape_data.data(), _data_train);
+    npy::SaveArrayAsNumpy(_file_prefix + "_data_csnn_train.npy", fortran_order, shape_data.size(), shape_data.data(), _data_train);
     npy::SaveArrayAsNumpy(_file_prefix + "_label_train.npy", fortran_order, shape_label.size(), shape_label.data(), _label_train);
 }
 
@@ -80,6 +80,6 @@ void SaveOutputNumpy::after_test() {
     const std::vector<long unsigned> shape_data{_test_sample_cnt, _width, _height, _depth};
     const std::vector<long unsigned> shape_label{_test_sample_cnt};
 
-    npy::SaveArrayAsNumpy(_file_prefix + "_data_test.npy", fortran_order, shape_data.size(), shape_data.data(), _data_test);    
+    npy::SaveArrayAsNumpy(_file_prefix + "_data_csnn_test.npy", fortran_order, shape_data.size(), shape_data.data(), _data_test);    
     npy::SaveArrayAsNumpy(_file_prefix + "_label_test.npy", fortran_order, shape_label.size(), shape_label.data(), _label_test);
 }

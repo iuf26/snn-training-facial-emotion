@@ -17,7 +17,7 @@
 #include "process/OnOffFilter.h"
 
 int main(int argc, char** argv) {
-	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10gs_pool2_3x3");
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, "cifar10gs_pool2_4x4");
 
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
 

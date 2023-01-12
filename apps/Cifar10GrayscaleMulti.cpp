@@ -80,46 +80,46 @@ int main(int argc, char** argv) {
 	///////////////////////////////
 
 	// conv1 : Save features
-	auto& conv1_save = experiment.output<SpikeTiming>(conv1);
-	conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
-	conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool1");
+	//auto& conv1_save = experiment.output<SpikeTiming>(conv1);
+	//conv1_save.add_postprocessing<process::MeanPooling>(2, 2); //sum pooling in the spike domain
+	//conv1_save.add_analysis<analysis::SaveOutputNumpy>("meanPool1");
 
 	// conv1 : Activity
-	auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
-	conv1_analysis.add_analysis<analysis::Activity>();
+	//auto& conv1_analysis = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	//conv1_analysis.add_analysis<analysis::Activity>();
 
 	// conv1 : SVM evaluation
-	auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
-	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
-	conv1_out.add_postprocessing<process::FeatureScaling>();
-	conv1_out.add_analysis<analysis::Svm>();
+	//auto& conv1_out = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	//conv1_out.add_postprocessing<process::SumPooling>(2, 2);
+	//conv1_out.add_postprocessing<process::FeatureScaling>();
+	//conv1_out.add_analysis<analysis::Svm>();
 
 	// pool1 : Save features
-	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1");
+	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1");
 
 	// pool1 : Activity
-	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
-	pool1_activity.add_analysis<analysis::Activity>();
+	//auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	//pool1_activity.add_analysis<analysis::Activity>();
 
 	// pool1 : SVM evaluation
 	auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
-	pool1_out.add_postprocessing<process::SumPooling>(2, 2);
-	pool1_out.add_postprocessing<process::FeatureScaling>();
+	//pool1_out.add_postprocessing<process::SumPooling>(2, 2);
+	//pool1_out.add_postprocessing<process::FeatureScaling>();
 	pool1_out.add_analysis<analysis::Svm>();
 
 	// pool2 : Save features
-	auto& pool2_save = experiment.output<SpikeTiming>(pool2);
-	pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
+	//auto& pool2_save = experiment.output<SpikeTiming>(pool2);
+	//pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
 
 	// pool2 : Activity
-	auto& pool2_activity = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_activity.add_analysis<analysis::Activity>();
+	//auto& pool2_activity = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
+	//pool2_activity.add_analysis<analysis::Activity>();
 
 	// pool2 : SVM evaluation
 	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_out.add_postprocessing<process::SumPooling>(2, 2);
-	pool2_out.add_postprocessing<process::FeatureScaling>();
+	//pool2_out.add_postprocessing<process::SumPooling>(2, 2);
+	//pool2_out.add_postprocessing<process::FeatureScaling>();
 	pool2_out.add_analysis<analysis::Svm>();
 
 	experiment.run(10000);

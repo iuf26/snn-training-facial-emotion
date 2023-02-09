@@ -99,6 +99,10 @@ int main(int argc, char** argv) {
 	conv2_out.add_analysis<analysis::Coherence>();
 	conv2_out.add_analysis<analysis::Svm>();
 
+	// pool2 : Save features
+	//auto& pool2_save = experiment.output<SpikeTiming>(pool2);
+	//pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
+
 	auto& pool2_out = experiment.output<TimeObjectiveOutput>(pool2, t_obj);
 	pool2_out.add_postprocessing<process::FeatureScaling>();
 	pool2_out.add_analysis<analysis::Svm>();

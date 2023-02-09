@@ -40,7 +40,9 @@ int main(int argc, char** argv) {
 	float th_lr = 1.0f;
 	float w_lr = 0.1f;
 
-	auto& conv1 = experiment.push<layer::Convolution>("conv1", 5, 5, 64);
+	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
+	conv1.set_name("conv1");
+	conv1.parameter<uint32_t>("epoch").set(200);
 	conv1.parameter<float>("annealing").set(0.95f);
 	conv1.parameter<float>("min_th").set(4.0f);
 	conv1.parameter<float>("t_obj").set(t_obj);
@@ -48,8 +50,6 @@ int main(int argc, char** argv) {
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(5.0, 0.1);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(w_lr, 0.1);
-
-	experiment.add_train_step(conv1, 100);
 
 	auto& pool1 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool1.set_name("pool1");

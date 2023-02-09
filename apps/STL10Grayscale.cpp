@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	float th_lr = 1.0f;
 	float w_lr = 0.1f;
 
-	auto& conv1 = experiment.push_layer<layer::Convolution>("conv1", 5, 5, 64);
+	auto& conv1 = experiment.push<layer::Convolution>("conv1", 5, 5, 64);
 	conv1.parameter<float>("annealing").set(0.95f);
 	conv1.parameter<float>("min_th").set(4.0f);
 	conv1.parameter<float>("t_obj").set(t_obj);

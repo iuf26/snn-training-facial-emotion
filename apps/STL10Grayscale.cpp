@@ -18,7 +18,7 @@
 
 int main(int argc, char** argv) {
 
-	Experiment<OptimizedLayerByLayer> experiment(argc, argv, "stl_10gs");
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, "stl_10gs");
 
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
 

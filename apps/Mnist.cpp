@@ -38,10 +38,9 @@ int main(int argc, char** argv) {
 
 	float w_lr = 0.1f;
 	float th_lr = 1.0f;
-
 	float t_obj = 0.75f;
 
-	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 32);
+	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(100);
 	conv1.parameter<float>("annealing").set(0.95f);
@@ -71,49 +70,39 @@ int main(int argc, char** argv) {
 	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	pool2.set_name("pool2");
 
-	//auto& fc1 = experiment.push<layer::Convolution>(4, 4, 4096);
-	//fc1.set_name("fc1");
-	//fc1.parameter<Training>("training").set<std::Annealing>(100, 0.95f);
-	//fc1.parameter<uint32_t>("epoch").set(100);
-	//fc1.parameter<float>("annealing").set(0.95f);
-	//fc1.parameter<float>("min_th").set(1.0f);
-	//fc1.parameter<float>("t_obj").set(t_obj);
-	//fc1.parameter<float>("lr_th").set(th_lr);
-	//fc1.parameter<bool>("wta_infer").set(false);
-	//fc1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	//fc1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
-	//fc1.parameter<STDP>("stdp").set<stdp::Biological>(w_lr, 0.1f);
+	
+	///////////////////////////////
+	/////////// OUTPUTS ///////////
+	///////////////////////////////
 
+	// pool1 : Save features
+	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1");
 
-	auto& conv1_out = experiment.output<TimeObjectiveOutput>(conv1, t_obj);
-	conv1_out.add_postprocessing<process::SumPooling>(2, 2);
-	conv1_out.add_postprocessing<process::FeatureScaling>();
-	conv1_out.add_analysis<analysis::Activity>();
-	conv1_out.add_analysis<analysis::Coherence>();
-	conv1_out.add_analysis<analysis::Svm>();
+	// pool1 : Activity
+	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	pool1_activity.add_analysis<analysis::Activity>();
 
-	auto& conv2_out = experiment.output<TimeObjectiveOutput>(conv2, t_obj);
-	conv2_out.add_postprocessing<process::SumPooling>(2, 2);
-	conv2_out.add_postprocessing<process::FeatureScaling>();
-	conv2_out.add_analysis<analysis::Activity>();
-	conv2_out.add_analysis<analysis::Coherence>();
-	conv2_out.add_analysis<analysis::Svm>();
+	// pool1 : SVM evaluation
+	auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	pool1_out.add_postprocessing<process::SumPooling>(4, 4);
+	pool1_out.add_postprocessing<process::FeatureScaling>();
+	pool1_out.add_analysis<analysis::Svm>();
 
 	// pool2 : Save features
 	//auto& pool2_save = experiment.output<SpikeTiming>(pool2);
 	//pool2_save.add_analysis<analysis::SaveOutputNumpy>("pool2");
 
-	auto& pool2_out = experiment.output<TimeObjectiveOutput>(pool2, t_obj);
+	// pool2 : Activity
+	auto& pool2_activity = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
+	pool2_activity.add_analysis<analysis::Activity>();
+
+	// pool2 : SVM evaluation
+	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
+	pool2_out.add_postprocessing<process::SumPooling>(4, 4);
 	pool2_out.add_postprocessing<process::FeatureScaling>();
 	pool2_out.add_analysis<analysis::Svm>();
-
-	//auto& fc1_out = experiment.output<TimeObjectiveOutput>(fc1, t_obj);
-	//fc1_out.add_postprocessing<process::FeatureScaling>();
-	//fc1_out.add_analysis<analysis::Activity>();
-	//fc1_out.template add_analysis<analysis::Coherence>();
-	//fc1_out.template add_analysis<analysis::Svm>();
-
+	
+	
 	experiment.run(10000);
-
-	return experiment.wait();
 }

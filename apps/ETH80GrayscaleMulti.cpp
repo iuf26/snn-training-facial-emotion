@@ -39,22 +39,22 @@ int main(int argc, char** argv) {
 	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(200);
-	conv1.parameter<float>("annealing").set(0.98);
+	conv1.parameter<float>("annealing").set(0.99);
 	conv1.parameter<float>("min_th").set(2.0);
-	conv1.parameter<float>("t_obj").set(0.8);
+	conv1.parameter<float>("t_obj").set(0.85);
 	conv1.parameter<float>("lr_th").set(0.1);
 	conv1.parameter<bool>("wta_infer").set(false);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(15.0, 0.1);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
 
-	auto& pool1 = experiment.push<layer::Pooling>(7, 7, 6, 6);
+	auto& pool1 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool1.set_name("pool1");
 
-	auto& conv2 = experiment.push<layer::Convolution>(5, 5, 128);
+	auto& conv2 = experiment.push<layer::Convolution>(3, 3, 128);
 	conv2.set_name("conv2");
 	conv2.parameter<uint32_t>("epoch").set(200);
-	conv2.parameter<float>("annealing").set(0.98);
+	conv2.parameter<float>("annealing").set(0.99);
 	conv2.parameter<float>("min_th").set(4.0);
 	conv2.parameter<float>("t_obj").set(0.9);
 	conv2.parameter<float>("lr_th").set(0.1);
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
 	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(20.0, 0.1);
 	conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
 
-	auto& pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
+	auto& pool2 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool2.set_name("pool2");
 
 	

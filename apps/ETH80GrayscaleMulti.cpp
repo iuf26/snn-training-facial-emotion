@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
 	experiment.push<process::FeatureScaling>();
 	experiment.push<LatencyCoding>();
 
-	experiment.add_train<dataset::STL>(input_path+"train_X.bin", input_path+"train_y.bin");
-	experiment.add_test<dataset::STL>(input_path+"test_X.bin", input_path+"test_y.bin");
+	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
+	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
 
 	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
 	conv1.set_name("conv1");

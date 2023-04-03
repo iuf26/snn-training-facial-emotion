@@ -298,9 +298,7 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 				for(size_t j=0; j<AVX_256_N; j++) {
 					if(_a.at_index(i*AVX_256_N+j) > th.at_index(i*AVX_256_N+j)) {
 						for(size_t z1=0; z1<depth; z1++) {
-							if (_model._t_obj != 0) {
-								th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-							}
+							th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
 							if(z1 != i*AVX_256_N+j) {
 								th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 							}
@@ -335,9 +333,7 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 			for(size_t j=0; j<r; j++) {
 				if(_a.at_index(n*AVX_256_N+j) > th.at_index(n*AVX_256_N+j)) {
 					for(size_t z1=0; z1<depth; z1++) {
-						if (_model._t_obj != 0) {
-							th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-						}
+						th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
 						if(z1 != n*AVX_256_N+j) {
 							th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 						}
@@ -485,9 +481,7 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 
 			if(_a.at(0, 0, z) >= th.at(z)) {
 				for(size_t z1=0; z1<depth; z1++) {
-					if (_model._t_obj != 0) {
-						th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-					}
+					th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
 					if(z1 != z) {
 						th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 					}

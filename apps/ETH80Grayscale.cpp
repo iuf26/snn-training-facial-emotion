@@ -36,17 +36,19 @@ int main(int argc, char** argv) {
 	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
 	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
 
+	float t_obj = 0.8;
 	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(200);
 	conv1.parameter<float>("annealing").set(0.99);
 	conv1.parameter<float>("min_th").set(2.0);
-	conv1.parameter<float>("t_obj").set(0.85);
-	conv1.parameter<float>("lr_th").set(0.1);
+	conv1.parameter<float>("t_obj").set(t_obj);
+	conv1.parameter<float>("lr_th").set(1.0);
 	conv1.parameter<bool>("wta_infer").set(false);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(15.0, 0.1);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
+	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 
 	auto& pool1 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool1.set_name("pool1");
@@ -80,6 +82,11 @@ int main(int argc, char** argv) {
 	pool1_out3.add_postprocessing<process::SumPooling>(4, 4);
 	pool1_out3.add_postprocessing<process::FeatureScaling>();
 	pool1_out3.add_analysis<analysis::Svm>();
+
+	auto& pool1_out4 = experiment.output<TimeObjectiveOutput>(pool1, t_obj);
+	pool1_out4.add_postprocessing<process::SumPooling>(4, 4);
+	pool1_out4.add_postprocessing<process::FeatureScaling>();
+	pool1_out4.add_analysis<analysis::Svm>();
 
 	experiment.run(10000);
 }

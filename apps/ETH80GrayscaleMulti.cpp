@@ -94,16 +94,16 @@ int main(int argc, char** argv) {
 	pool2_activity.add_analysis<analysis::Activity>();
 
 	// pool2 : SVM evaluation
-	
+
 	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
 	pool2_out.add_postprocessing<process::SumPooling>(12, 12);
 	pool2_out.add_postprocessing<process::FeatureScaling>();
 	pool2_out.add_analysis<analysis::Svm>();
 
-	auto& pool2_out = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_out.add_postprocessing<process::SumPooling>(8, 8);
-	pool2_out.add_postprocessing<process::FeatureScaling>();
-	pool2_out.add_analysis<analysis::Svm>();
+	auto& pool2_out1 = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
+	pool2_out1.add_postprocessing<process::SumPooling>(8, 8);
+	pool2_out1.add_postprocessing<process::FeatureScaling>();
+	pool2_out1.add_analysis<analysis::Svm>();
 
 	auto& pool2_out2 = experiment.output<DefaultOutput>(pool2, 0.0, 1.0);
 	pool2_out.add_postprocessing<process::SumPooling>(4, 4);

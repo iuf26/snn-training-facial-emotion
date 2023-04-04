@@ -37,39 +37,39 @@ int main(int argc, char** argv) {
 	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
 
 
-	float t_obj1 = 0.8;
+	float t_obj1 = 0.75;
 	auto& conv1 = experiment.push<layer::Convolution>(5, 5, 64);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(200);
 	conv1.parameter<float>("annealing").set(0.99);
 	conv1.parameter<float>("min_th").set(2.0);
 	conv1.parameter<float>("t_obj").set(t_obj1);
-	conv1.parameter<float>("lr_th").set(1.0);
+	conv1.parameter<float>("lr_th").set(0);
 	conv1.parameter<bool>("wta_infer").set(false);
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
-	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
-	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
+	//conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
+	conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.2f);
 
 	auto& pool1 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool1.set_name("pool1");
 
 
 	float t_obj2 = 0.85;
-	auto& conv2 = experiment.push<layer::Convolution>(3, 3, 128);
+	auto& conv2 = experiment.push<layer::Convolution>(5, 5, 128);
 	conv2.set_name("conv2");
 	conv2.parameter<uint32_t>("epoch").set(200);
 	conv2.parameter<float>("annealing").set(0.99);
-	conv2.parameter<float>("min_th").set(4.0);
+	conv2.parameter<float>("min_th").set(2.0);
 	conv2.parameter<float>("t_obj").set(t_obj2);
-	conv2.parameter<float>("lr_th").set(1.0);
+	conv2.parameter<float>("lr_th").set(0);
 	conv2.parameter<bool>("wta_infer").set(false);
 	//conv2.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv2.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
 	conv2.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(15.0, 0.1);
-	conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
-	//conv2.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
+	//conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
+	conv2.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.2f);
 
 	auto& pool2 = experiment.push<layer::Pooling>(4, 4, 4, 4);
 	pool2.set_name("pool2");

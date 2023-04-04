@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
 	pool2_out3.add_postprocessing<process::FeatureScaling>();
 	pool2_out3.add_analysis<analysis::Svm>();
 
-	auto& pool2_out4 = experiment.output<TimeObjectiveOutput>(pool2, t_obj);
+	auto& pool2_out4 = experiment.output<TimeObjectiveOutput>(pool2, t_obj2);
 	pool2_out4.add_postprocessing<process::SumPooling>(4, 4);
 	pool2_out4.add_postprocessing<process::FeatureScaling>();
 	pool2_out4.add_analysis<analysis::Svm>();

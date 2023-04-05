@@ -12,6 +12,7 @@
 #include "analysis/Coherence.h"
 #include "process/Input.h"
 #include "process/Scaling.h"
+#include "process/Norm.h"
 #include "process/Pooling.h"
 #include "process/GrayScale.h"
 #include "process/OnOffFilter.h"
@@ -29,8 +30,9 @@ int main(int argc, char** argv) {
 	std::string input_path(input_path_ptr);
 
 	experiment.push<process::GrayScale>();
+	experiment.push<process::Normalizing>(255.);
 	experiment.push<process::DefaultOnOffFilter>(7, 1.0, 2.0);
-	experiment.push<process::FeatureScaling>();
+	//experiment.push<process::FeatureScaling>();
 	experiment.push<LatencyCoding>();
 
 	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
@@ -63,8 +65,8 @@ int main(int argc, char** argv) {
 	conv1_activity.add_analysis<analysis::Coherence>();
 
 	// pool1 : Save features
-	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");
+	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");
 
 	// pool1 : Activity
 	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);

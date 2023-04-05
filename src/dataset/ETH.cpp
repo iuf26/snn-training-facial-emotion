@@ -29,10 +29,10 @@ std::pair<std::string, Tensor<InputType>> ETH::next() {
 	for(size_t z=0; z<ETH_DEPTH; z++) {
 		for(size_t x=0; x<ETH_WIDTH; x++) {
 			for(size_t y=0; y<ETH_HEIGHT; y++) {
-				uint8_t pixel;
-				_image_file.read((char*)&pixel, sizeof(uint8_t));
+				float pixel;
+				_image_file.read((char*)&pixel, sizeof(float));
 
-				out.second.at(x, y, z) = static_cast<InputType>(pixel)/static_cast<InputType>(std::numeric_limits<uint8_t>::max());
+				out.second.at(x, y, z) = static_cast<InputType>(pixel)/static_cast<InputType>(std::numeric_limits<float>::max());
 			}
 		}
 	}

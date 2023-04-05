@@ -62,11 +62,6 @@ void Coherence::process() {
 				}
 			}
 			mean_w = mean_w / w.shape().product();
-			
-			const Tensor<float>& th = experiment().process_at(layer_index()).parameter<Tensor<float>>("th").get();
-			for (int i=0; i < 64; ++i) {
-				std::cout<<th.at(i)<<std::endl;
-			}
 
 
 			std::sort(std::begin(list), std::end(list));

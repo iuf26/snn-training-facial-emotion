@@ -29,25 +29,24 @@ int main(int argc, char** argv) {
 	std::string input_path(input_path_ptr);
 
 	experiment.push<process::GrayScale>();
-	experiment.push<process::DefaultOnOffFilter>(7, 1.0, 2.0);
+	experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
 	//experiment.push<process::FeatureScaling>();
 	experiment.push<LatencyCoding>();
 
 	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
 	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
 
-	float t_obj = -1;
 	auto& conv1 = experiment.push<layer::Convolution>(7, 7, 64);
 	conv1.set_name("conv1");
-	conv1.parameter<uint32_t>("epoch").set(1000);
+	conv1.parameter<uint32_t>("epoch").set(5000);
 	conv1.parameter<float>("annealing").set(1);
 	conv1.parameter<float>("min_th").set(0);
-	conv1.parameter<float>("t_obj").set(t_obj);
+	conv1.parameter<float>("t_obj").set(-1);
 	conv1.parameter<float>("lr_th").set(0);
 	conv1.parameter<bool>("wta_infer").set(false);
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(6.0);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(18.0);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 0);
 	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 

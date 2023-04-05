@@ -59,6 +59,9 @@ int main(int argc, char** argv) {
 	/////////// OUTPUTS ///////////
 	///////////////////////////////
 
+	auto& conv1_activity = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_activity.add_analysis<analysis::Coherence>();
+	
 	// pool1 : Save features
 	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
 	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");

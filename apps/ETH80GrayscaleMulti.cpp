@@ -79,6 +79,9 @@ int main(int argc, char** argv) {
 	/////////// OUTPUTS ///////////
 	///////////////////////////////
 
+	auto& conv1_activity = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_activity.add_analysis<analysis::Coherence>();
+	
 	// pool1 : Activity
 	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
 	pool1_activity.add_analysis<analysis::Activity>();

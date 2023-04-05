@@ -8,6 +8,10 @@ Nothing::Nothing() : Layer3D(_register) {
 
 }
 
+Nothing::Nothing(size_t filter_width, size_t filter_height, size_t stride_x, size_t stride_y, size_t padding_x, size_t padding_y) :
+	Layer3D(_register, filter_width, filter_height, 0, stride_x, stride_y, padding_x, padding_y) {
+	}
+
 Shape Nothing::compute_shape(const Shape& previous_shape) {
 	parameter<size_t>("filter_number").set(previous_shape.dim(2));
 	Layer3D::compute_shape(previous_shape);

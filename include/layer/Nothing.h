@@ -9,6 +9,7 @@ namespace layer {
 
 	public:
         Nothing();
+		Nothing(size_t filter_width, size_t filter_height, size_t stride_x, size_t stride_y, size_t padding_x = 0, size_t padding_y = 0);
 
 		virtual Shape compute_shape(const Shape& previous_shape);
 

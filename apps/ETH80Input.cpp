@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
 	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
 
-	auto& pool1 = experiment.push<layer::Nothing>();
+	auto& pool1 = experiment.push<layer::Nothing>(1,1,1,1);
 	pool1.set_name("pool1");
 
 	

@@ -32,7 +32,7 @@ std::pair<std::string, Tensor<InputType>> ETH::next() {
 				float pixel;
 				_image_file.read((char*)&pixel, sizeof(float));
 
-				out.second.at(x, y, z) = static_cast<InputType>(pixel)/static_cast<InputType>(std::numeric_limits<float>::max());
+				out.second.at(x, y, z) = static_cast<InputType>(pixel);//static_cast<InputType>(std::numeric_limits<float>::max());
 			}
 		}
 	}

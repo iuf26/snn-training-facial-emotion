@@ -12,7 +12,6 @@
 #include "analysis/Coherence.h"
 #include "process/Input.h"
 #include "process/Scaling.h"
-#include "process/Norm.h"
 #include "process/Pooling.h"
 #include "process/GrayScale.h"
 #include "process/OnOffFilter.h"
@@ -30,7 +29,6 @@ int main(int argc, char** argv) {
 	std::string input_path(input_path_ptr);
 
 	//experiment.push<process::GrayScale>();
-	//experiment.push<process::Normalizing>(255.);
 	//experiment.push<process::DefaultOnOffFilter>(7, 1.0, 2.0);
 	//experiment.push<process::FeatureScaling>();
 	experiment.push<LatencyCoding>();
@@ -49,7 +47,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<bool>("wta_infer").set(false);
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(15.0);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(10.0);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 0);
 	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 

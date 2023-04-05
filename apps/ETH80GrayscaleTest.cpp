@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<bool>("wta_infer").set(false);
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.000001);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(10.0);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 0);
 	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 

@@ -34,11 +34,9 @@ void GrayScale::_process(Tensor<float>& in) const {
 		for(size_t y=0; y<_height; y++) {
 			float v = 0;
             for(size_t z=0; z<3; z++) {
-                //v += in.at(x,y,z) * in.at(x,y,z);
 				//NOTE: Assume that the input order is RGB
 				v += in.at(x,y,z) * ((z == 0) ? 0.2989 : ((z == 1) ? 0.5870 : 0.1140));
 			}
-            //out.at(x, y, 1) = sqrt(v / 3);
 			out.at(x, y, 0) = v;
 		}
 	}

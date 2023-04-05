@@ -29,7 +29,7 @@ void Coherence::process() {
 			size_t n = w.shape().dim(3);
 
 			std::vector<float> list;
-
+			
 			for(size_t i=0; i<n; i++) {
 				for(size_t j=i+1; j<n;j++) {
 					float value = 0;
@@ -50,6 +50,20 @@ void Coherence::process() {
 				}
 			}
 
+			// Mean weights
+			float mean_w = 0;
+			for(size_t i=0; i<n; i++) {
+				for(size_t x=0; x<width; x++) {
+					for(size_t y=0; y<height; y++) {
+						for(size_t z=0; z<depth; z++) {
+							mean_w += w.at(x, y, z, i);
+						}
+					}
+				}
+			}
+			mean_w = mean_w / w.shape().product();
+
+
 			std::sort(std::begin(list), std::end(list));
 
 			experiment().log() << "N: " << list.size() << std::endl;
@@ -58,6 +72,7 @@ void Coherence::process() {
 			experiment().log() << "Q2: " << list.at(std::min(list.size()-1, (list.size()*2)/4)) << std::endl;
 			experiment().log() << "Q3: " << list.at(std::min(list.size()-1, (list.size()*3)/4)) << std::endl;
 			experiment().log() << "Max: " << list.back() << std::endl;
+			experiment().log() << "Mean weights: " << mean_w << std::endl;
 		}
 		else {
 			experiment().log() << "Incompatible w shape." << std::endl;

@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<bool>("wta_infer").set(false);
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.0001);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.000001);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 0);
 	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 
@@ -61,10 +61,10 @@ int main(int argc, char** argv) {
 
 	auto& conv1_activity = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_activity.add_analysis<analysis::Coherence>();
-	
+
 	// pool1 : Save features
-	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");
+	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");
 
 	// pool1 : Activity
 	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);

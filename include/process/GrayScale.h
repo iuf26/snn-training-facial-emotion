@@ -2,6 +2,7 @@
 #define _PROCESS_GRAYSCALE_H
 
 #include "Process.h"
+#include <cassert>
 #include <cmath>
 
 namespace process {

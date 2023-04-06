@@ -47,11 +47,11 @@ int main(int argc, char** argv) {
 	conv1.parameter<bool>("wta_infer").set(false);
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(18.0);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(13.0);
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 0);
 	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 
-	auto& pool1 = experiment.push<layer::Pooling>(4, 4, 4, 4);
+	auto& pool1 = experiment.push<layer::Pooling>(8, 8, 8, 8);
 	pool1.set_name("pool1");
 
 	
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 
 	// pool1 : Save features
 	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");
+	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_8x8");
 
 	// pool1 : SVM evaluation	
 	auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);

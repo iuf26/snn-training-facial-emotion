@@ -44,11 +44,11 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("min_th").set(0);
 	conv1.parameter<float>("t_obj").set(-1);
 	conv1.parameter<float>("lr_th").set(0);
-	conv1.parameter<bool>("wta_infer").set(false);
+	conv1.parameter<bool>("wta_infer").set(true); //NOTE : not implemented on CPU
 	//conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(0.5, 0.01);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(13.0);
-	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 0);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(18.0);
+	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(0.1, 1);
 	//conv1.parameter<STDP>("stdp").set<stdp::Biological>(0.1, 0.1f);
 
 	auto& pool1 = experiment.push<layer::Pooling>(8, 8, 8, 8);

@@ -26,9 +26,9 @@ bool ETH::has_next() const {
 std::pair<std::string, Tensor<InputType>> ETH::next() {
 	std::pair<std::string, Tensor<InputType>> out(std::to_string(static_cast<size_t>(_next_label)), _shape);
 
-	for(size_t z=0; z<ETH_DEPTH; z++) {
-		for(size_t x=0; x<ETH_WIDTH; x++) {
-			for(size_t y=0; y<ETH_HEIGHT; y++) {
+	for(size_t x=0; x<ETH_WIDTH; x++) {
+		for(size_t y=0; y<ETH_HEIGHT; y++) {
+			for(size_t z=0; z<ETH_DEPTH; z++) {
 				uint8_t pixel;
 				_image_file.read((char*)&pixel, sizeof(uint8_t));
 

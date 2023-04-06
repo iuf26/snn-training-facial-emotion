@@ -27,8 +27,8 @@ std::pair<std::string, Tensor<InputType>> STL::next() {
 	std::pair<std::string, Tensor<InputType>> out(std::to_string(static_cast<size_t>(_next_label)), _shape);
 
 	for(size_t z=0; z<STL_DEPTH; z++) {
-		for(size_t x=0; x<STL_WIDTH; x++) {
-			for(size_t y=0; y<STL_HEIGHT; y++) {
+		for(size_t y=0; y<STL_HEIGHT; y++) {
+			for(size_t x=0; x<STL_WIDTH; x++) {
 				uint8_t pixel;
 				_image_file.read((char*)&pixel, sizeof(uint8_t));
 

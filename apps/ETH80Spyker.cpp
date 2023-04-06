@@ -28,9 +28,10 @@ int main(int argc, char** argv) {
 
 	std::string input_path(input_path_ptr);
 
-	experiment.push<process::GrayScale>();
-	experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
+	//experiment.push<process::GrayScale>();
+	//experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
 	//experiment.push<process::FeatureScaling>();
+	//experiment.push<process::SampleScaling>();
 	experiment.push<LatencyCoding>();
 
 	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
 
 	auto& conv1 = experiment.push<layer::Convolution>(7, 7, 64);
 	conv1.set_name("conv1");
-	conv1.parameter<uint32_t>("epoch").set(5000);
+	conv1.parameter<uint32_t>("epoch").set(200);
 	conv1.parameter<float>("annealing").set(1);
 	conv1.parameter<float>("min_th").set(0);
 	conv1.parameter<float>("t_obj").set(-1);

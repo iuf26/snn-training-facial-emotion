@@ -9,9 +9,9 @@
 #include "Tensor.h"
 #include "Input.h"
 
-#define ETH_WIDTH 100
-#define ETH_HEIGHT 100
-#define ETH_DEPTH 3
+#define ETH_WIDTH 94//100
+#define ETH_HEIGHT 94//100
+#define ETH_DEPTH 2//3
 
 namespace dataset {
 

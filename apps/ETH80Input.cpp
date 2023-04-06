@@ -30,9 +30,9 @@ int main(int argc, char** argv) {
 	std::string input_path(input_path_ptr);
 
 	experiment.push<process::GrayScale>();
-	experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
+	//experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
 	//experiment.push<process::FeatureScaling>();
-	experiment.push<LatencyCoding>();
+	//experiment.push<LatencyCoding>();
 
 	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
 	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 	///////////////////////////////
 
 	// pool1 : Save features
-	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	auto& pool1_save = experiment.output<NoOutputConversion>(pool1);
 	pool1_save.add_analysis<analysis::SaveOutputNumpy>("dog");
 
 

@@ -58,19 +58,17 @@ int main(int argc, char** argv) {
 	/////////// OUTPUTS ///////////
 	///////////////////////////////
 
+	// Output analysis
 	auto& conv1_activity = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_activity.add_analysis<analysis::Coherence>();
+	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	pool1_activity.add_analysis<analysis::Activity>();
 
 	// pool1 : Save features
 	//auto& pool1_save = experiment.output<SpikeTiming>(pool1);
 	//pool1_save.add_analysis<analysis::SaveOutputNumpy>("pool1_4x4");
 
-	// pool1 : Activity
-	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
-	pool1_activity.add_analysis<analysis::Activity>();
-
-	// pool1 : SVM evaluation
-	
+	// pool1 : SVM evaluation	
 	auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
 	pool1_out.add_analysis<analysis::Svm>();
 

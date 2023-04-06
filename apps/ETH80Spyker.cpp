@@ -28,9 +28,9 @@ int main(int argc, char** argv) {
 
 	std::string input_path(input_path_ptr);
 
-	//experiment.push<process::GrayScale>();
-	//experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
-	//experiment.push<process::FeatureScaling>();
+	experiment.push<process::GrayScale>();
+	experiment.push<process::DefaultOnOffFilter>(7, 0.333, 0.666);
+	experiment.push<process::FeatureScaling>();
 	//experiment.push<process::SampleScaling>();
 	experiment.push<LatencyCoding>();
 

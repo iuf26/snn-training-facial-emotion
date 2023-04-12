@@ -1,7 +1,7 @@
 {
     "app_name": "eth80gs",
     "seed": 0,
-    "output_path": "./",
+    "output_path": "../../",
 
     "dog_k": 7,
     "dog_std1": 0.333,

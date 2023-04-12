@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
 //	const char* c_str = proxy;
 //	std::string str(c_str); // Convert the C-style string to a std::stri
 
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>(config["output_path"]);
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>(config["output_path"].as<const char*>());
 
 	// SVM evaluation
 	if (config["svm_eval"]) {

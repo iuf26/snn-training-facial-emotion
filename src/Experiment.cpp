@@ -232,7 +232,7 @@ void AbstractExperiment::run(size_t refresh_interval) {
 #endif
 	process(refresh_interval);
 
-	_save(_output_path + "/" + "param-"+_name);
+	//_save(_output_path + "/" + "param-"+_name);
 
 	auto t_end = std::chrono::high_resolution_clock ::now();
 

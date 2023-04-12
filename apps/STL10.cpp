@@ -37,6 +37,13 @@ int main(int argc, char** argv) {
 	if (error) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}
+	// Copy config path to output path
+	std::string output_path(config["output_path"].as<const char*>());
+	std::ifstream  src(config_path, std::ios::binary);
+	std::ofstream  dst(output_path + "/config.json", std::ios::binary);
+	dst << src.rdbuf();
+    src.close();
+    dst.close();
 
 	// Initialize experiment
 	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);

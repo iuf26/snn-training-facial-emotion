@@ -42,6 +42,8 @@ int main(int argc, char** argv) {
 	std::ifstream  src(config_path, std::ios::binary);
 	std::ofstream  dst(output_path + "/config.json", std::ios::binary);
 	dst << src.rdbuf();
+    src.close();
+    dst.close();
 
 	// Initialize experiment
 	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);

@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     dst.close();
 
 	// Initialize experiment
-	Experiment<SparseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);
 
 	// Load dataset
 	const char* input_path_ptr = std::getenv("INPUT_PATH");

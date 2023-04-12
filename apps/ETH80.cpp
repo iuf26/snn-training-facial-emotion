@@ -77,7 +77,12 @@ int main(int argc, char** argv) {
 
 	// Save features
 	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>(config["output_path"]);
+
+	ArduinoJson6173_71::MemberProxy<ArduinoJson6173_71::JsonDocument&, const char*> proxy = config["output_path"];
+	const char* c_str = proxy.as<const char*>();
+	std::string str(c_str); // Convert the C-style string to a std::stri
+
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>(str);
 
 	experiment.run(10000);
 }

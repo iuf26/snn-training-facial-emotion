@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
 	}
 	std::string config_path(config_path_ptr);
 	std::ifstream _jsonTextFile(config_path);
-    if (!_jsonTextFile.good()) {
-        throw std::runtime_error("Failed to open JSON config");
-    }
+	if (!_jsonTextFile.good()) {
+		throw std::runtime_error("Failed to open JSON config");
+	}
 	std::stringstream buffer;
 	buffer << _jsonTextFile.rdbuf();
 	std::string _jsonText = buffer.str();

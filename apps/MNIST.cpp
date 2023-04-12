@@ -25,9 +25,9 @@ int main(int argc, char** argv) {
 	}
 	std::string config_path(config_path_ptr);
 	std::ifstream _jsonTextFile(config_path);
-    if (!_jsonTextFile.good()) {
-        throw std::runtime_error("Failed to open JSON config");
-    }
+	if (!_jsonTextFile.good()) {
+		throw std::runtime_error("Failed to open JSON config");
+	}
 	std::stringstream buffer;
 	buffer << _jsonTextFile.rdbuf();
 	std::string _jsonText = buffer.str();
@@ -38,10 +38,10 @@ int main(int argc, char** argv) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}
 	// Copy config path to output path
-    std::string output_path(config["output_path"].as<const char*>());
+	std::string output_path(config["output_path"].as<const char*>());
 	std::ifstream  src(config_path, std::ios::binary);
-    std::ofstream  dst(output_path, std::ios::binary);
-    dst << src.rdbuf();
+	std::ofstream  dst(output_path, std::ios::binary);
+	dst << src.rdbuf();
 
 	// Initialize experiment
 	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);

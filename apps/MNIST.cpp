@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	// Copy config path to output path
 	std::string output_path(config["output_path"].as<const char*>());
 	std::ifstream  src(config_path, std::ios::binary);
-	std::ofstream  dst(output_path, std::ios::binary);
+	std::ofstream  dst(output_path + "/config.json", std::ios::binary);
 	dst << src.rdbuf();
 
 	// Initialize experiment

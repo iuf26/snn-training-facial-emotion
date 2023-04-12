@@ -1,7 +1,7 @@
 #ifndef _ANALYSIS_SAVE_OUTPUT_NUMPY_H
 #define _ANALYSIS_SAVE_OUTPUT_NUMPY_H
 
-#include<iostream>
+#include <iostream>
 #include "Analysis.h"
 #include "dep/npy.hpp"
 
@@ -11,7 +11,7 @@ namespace analysis {
 
 	public:
 		SaveOutputNumpy();
-		SaveOutputNumpy(const std::string& file_prefix);
+		SaveOutputNumpy(const std::string& path);
 		SaveOutputNumpy(const SaveOutputNumpy& that) = delete;
 		SaveOutputNumpy& operator=(const SaveOutputNumpy& that) = delete;
 
@@ -27,7 +27,7 @@ namespace analysis {
 
 	private:
 
-		std::string _file_prefix;
+		std::string _path;
 
 		std::vector<float> _data_train;
 		std::vector<float> _data_test;

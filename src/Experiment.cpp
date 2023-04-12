@@ -2,22 +2,22 @@
 
 
 #ifdef ENABLE_QT
-AbstractExperiment::AbstractExperiment(int& argc, char** argv, const std::string& name) :
-	AbstractExperiment(name) {
+AbstractExperiment::AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed) :
+	AbstractExperiment(output_path, name, seed) {
 	_app = new QApplication(argc, argv);
 }
 #else
-AbstractExperiment::AbstractExperiment(int&, char**, const std::string& name) :
-	AbstractExperiment(name) {
+AbstractExperiment::AbstractExperiment(int&, char**, const std::string& output_path, const std::string& name, int seed) :
+	AbstractExperiment(output_path, name, seed) {
 
 }
 #endif
 
-AbstractExperiment::AbstractExperiment(const std::string& name) :
+AbstractExperiment::AbstractExperiment(const std::string& output_path, const std::string& name, int seed) :
 #ifdef ENABLE_QT
 	_app(nullptr),
 #endif
-	_logger(), _log(_logger.create()), _print(_logger.create()), _name(name), _random_generator(),
+	_logger(), _log(_logger.create()), _print(_logger.create()), _output_path(output_path), _name(name), _seed(seed), _random_generator(),
 	_input_shape(nullptr), _time_limit(1.0), _train_data(), _test_data(), _process_list(),
 #ifdef ENABLE_QT
 	_plots(),
@@ -29,7 +29,8 @@ AbstractExperiment::AbstractExperiment(const std::string& name) :
 	size_t version = 0;
 
 	while(true) {
-		std::ifstream in_file("exp-"+name+(version == 0 ? "" : "_"+std::to_string(version)));
+		std::string filename = _output_path + "/" + ("exp-" + _name + (version == 0 ? "" : "_" + std::to_string(version)));
+		std::ifstream in_file(filename);
 		if(!in_file.good()) {
 			break;
 		}
@@ -42,19 +43,17 @@ AbstractExperiment::AbstractExperiment(const std::string& name) :
 		std::cout << "Experiment renamed in " << _name << std::endl;
 	}
 
-	std::seed_seq seed(std::begin(_name), std::end(_name));
-	_random_generator.seed(seed);
-
-
+	std::seed_seq seed_seq{_seed};
+	_random_generator.seed(seed_seq);
 
 	_print << "Experiment " << _name << std::endl;
 
 	_log.add_output(std::cout);
-	if(!_log.add_output<std::ofstream>("exp-"+_name, std::ios::out).good()) {
-		throw std::runtime_error("Can't open file exp-"+_name);
+	if(!_log.add_output<std::ofstream>(_output_path + "/" + "exp-"+_name, std::ios::out).good()) {
+		throw std::runtime_error("Can't open file " + _output_path + "/" + "exp-"+_name);
 	}
 	_print_date(_log) << std::endl;
-	_log << "Random seed: " << _name << std::endl;
+	_log << "Random seed: " << _seed << std::endl;
 	_log << std::endl;
 }
 

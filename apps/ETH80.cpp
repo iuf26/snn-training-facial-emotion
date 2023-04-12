@@ -6,6 +6,7 @@
 #include "layer/Pooling.h"
 #include "Distribution.h"
 #include "execution/DenseIntermediateExecution.h"
+#include "execution/SparseIntermediateExecution.h"
 #include "analysis/Svm.h"
 #include "analysis/SaveOutputNumpy.h"
 #include "analysis/Activity.h"
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
 	*/
 
 	// Initialize experiment
-	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);
+	Experiment<SparseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);
 
 	// Load dataset
 	const char* input_path_ptr = std::getenv("INPUT_PATH");

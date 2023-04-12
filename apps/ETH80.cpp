@@ -32,8 +32,8 @@ int main(int argc, char** argv) {
 	buffer << _jsonTextFile.rdbuf();
 	std::string _jsonText = buffer.str();
 	_jsonTextFile.close();
-	DynamicJsonDocument doc(JSON_ARRAY_SIZE(_jsonText.length()));
-	DeserializationError error = deserializeJson(doc, _jsonText.c_str());
+	DynamicJsonDocument config(JSON_ARRAY_SIZE(_jsonText.length()));
+	DeserializationError error = deserializeJson(config, _jsonText.c_str());
 	if (error) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}

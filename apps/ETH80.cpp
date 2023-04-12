@@ -32,11 +32,13 @@ int main(int argc, char** argv) {
 	buffer << _jsonTextFile.rdbuf();
 	std::string _jsonText = buffer.str();
 	_jsonTextFile.close();
-	DynamicJsonDocument config(JSON_ARRAY_SIZE(_jsonText.length()));
-	DeserializationError error = deserializeJson(config, _jsonText.c_str());
+	DynamicJsonDocument doc(JSON_ARRAY_SIZE(_jsonText.length()));
+	DeserializationError error = deserializeJson(doc, _jsonText.c_str());
 	if (error) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}
+	JsonObject config = doc.to<JsonObject>();
+	std::cout << config["output_path"];
 
 	// Initialize experiment
 	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);

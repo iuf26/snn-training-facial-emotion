@@ -88,10 +88,10 @@ int main(int argc, char** argv) {
 //	const char* c_str = proxy;
 //	std::string str(c_str); // Convert the C-style string to a std::stri
 
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>(config["output_path"].as<const char*>());
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>(config["output_path"]);
 
 	// SVM evaluation
-	if config["svm_eval"] {
+	if (config["svm_eval"]) {
 		auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
 		pool1_out.add_analysis<analysis::Svm>();
 	}

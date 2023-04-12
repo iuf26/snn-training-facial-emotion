@@ -1,5 +1,5 @@
 #include "Experiment.h"
-#include "dataset/ETH.h"
+#include "dataset/Mnist.h"
 #include "stdp/Multiplicative.h"
 #include "stdp/Biological.h"
 #include "layer/Convolution.h"
@@ -47,11 +47,10 @@ int main(int argc, char** argv) {
 		throw std::runtime_error("Require to define INPUT_PATH variable");
 	}
 	std::string input_path(input_path_ptr);
-	experiment.add_train<dataset::ETH>(input_path+"train_X.bin", input_path+"train_y.bin");
-	experiment.add_test<dataset::ETH>(input_path+"test_X.bin", input_path+"test_y.bin");
+	experiment.add_train<dataset::Mnist>(input_path+"train-images.idx3-ubyte", input_path+"train-labels.idx1-ubyte");
+	experiment.add_test<dataset::Mnist>(input_path+"t10k-images.idx3-ubyte", input_path+"t10k-labels.idx1-ubyte");
 
 	// Preprocessing
-	experiment.push<process::GrayScale>();
 	experiment.push<process::DefaultOnOffFilter>(config["dog_k"], config["dog_std1"], config["dog_std2"]);
 	experiment.push<process::FeatureScaling>();
 	experiment.push<LatencyCoding>();

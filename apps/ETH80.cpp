@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
 	if (error) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}
-	JsonObject config = doc.to<JsonObject>();
 	std::cout << config["output_path"];
 
 	// Initialize experiment

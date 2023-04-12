@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
 	if (error) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}
-	std::cout << config["output_path"];
 
 	// Initialize experiment
 	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);
@@ -67,7 +66,7 @@ int main(int argc, char** argv) {
 	conv1.parameter<float>("lr_th").set(config["conv1_lr_th"]);
 	conv1.parameter<bool>("wta_infer").set(config["conv1_wta_infer"]);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(config["conv1_w_init_mean"], config["conv1_w_init_std"]);
-	conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(config["conv1_th"], 0.0001);
+	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(config["conv1_th"].as<float>());
 	conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(config["conv1_stdp_lr"], config["conv1_stdp_b"]);
 
 	// Pooling layer

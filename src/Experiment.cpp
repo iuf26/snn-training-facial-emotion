@@ -29,7 +29,7 @@ AbstractExperiment::AbstractExperiment(const std::string& output_path, const std
 	size_t version = 0;
 
 	while(true) {
-		std::string filename = _output_path + "/" + ("exp-" + _name + (version == 0 ? "" : "_" + std::to_string(version)));
+		std::string filename = _output_path + "/" + ("exp-" + _name + (version == 0 ? "" : "_" + std::to_string(version)) + ".txt");
 		std::ifstream in_file(filename);
 		if(!in_file.good()) {
 			break;
@@ -49,8 +49,9 @@ AbstractExperiment::AbstractExperiment(const std::string& output_path, const std
 	_print << "Experiment " << _name << std::endl;
 
 	_log.add_output(std::cout);
-	if(!_log.add_output<std::ofstream>(_output_path + "/" + "exp-"+_name, std::ios::out).good()) {
-		throw std::runtime_error("Can't open file " + _output_path + "/" + "exp-"+_name);
+	std::string filename = _output_path + "/" + "exp-" +_name + ".txt";
+	if(!_log.add_output<std::ofstream>(filename, std::ios::out).good()) {
+		throw std::runtime_error("Can't open file " + filename);
 	}
 	_print_date(_log) << std::endl;
 	_log << "Random seed: " << _seed << std::endl;
@@ -231,7 +232,7 @@ void AbstractExperiment::run(size_t refresh_interval) {
 #endif
 	process(refresh_interval);
 
-	_save("param-"+_name);
+	_save(_output_path + "/" + "param-"+_name);
 
 	auto t_end = std::chrono::high_resolution_clock ::now();
 

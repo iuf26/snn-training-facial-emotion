@@ -57,6 +57,10 @@ int main(int argc, char** argv) {
 
 	// Initialize experiment
 	Experiment<DenseIntermediateExecution> experiment(argc, argv, output_path, config["exp_name"], seed);
+	
+	if (config["use_sparse"] == true) {
+		Experiment<SparseIntermediateExecution> experiment(argc, argv, output_path, config["exp_name"], seed);
+	}
 
 	// Save config path to output path
 	std::ofstream output_config_file(output_path + "/csnn_config_"+experiment.name()+".json");

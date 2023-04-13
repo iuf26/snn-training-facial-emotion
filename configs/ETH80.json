@@ -22,10 +22,7 @@
     "conv1_stdp_b": 1,
     "conv1_stdp_lr": 0.1,
 
-    "pool1_k_w": 8,
-    "pool1_k_h": 8,
-    "pool1_s_w": 8,
-    "pool1_s_h": 8,
+    "pool1_size": 8,
 
     "use_sparse": true,
     "svm_eval": false

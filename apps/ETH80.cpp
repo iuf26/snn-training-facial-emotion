@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 	}
 
 	// Pooling layer
-	auto& pool1 = experiment->push<layer::Pooling>(config["pool1_k_w"], config["pool1_k_h"], config["pool1_s_w"], config["pool1_s_h"]);
+	auto& pool1 = experiment->push<layer::Pooling>(config["pool1_size"], config["pool1_size"], config["pool1_size"], config["pool1_size"]);
 	pool1.set_name("pool1");
 
 	// Activity analysis

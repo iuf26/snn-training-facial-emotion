@@ -67,23 +67,10 @@ void SparseIntermediateExecution::_process_train_data(AbstractProcess& process, 
 
 	for(size_t i=0; i<n; i++) {
 
-		size_t total_size = 0;
-		size_t total_capacity = 0;
 		for(size_t j=0; j<data.size(); j++) {
 			Tensor<float> current = from_sparse_tensor(data[j].second);
 			process.process_train_sample(data[j].first, current, i, j, data.size());
 			data[j].second = to_sparse_tensor(current);
-
-			total_size += data[j].second.values().size();
-			total_capacity += data[j].second.values().size();
-
-			if(j%10000 == 10000-1) {
-				std::cout << static_cast<double>(total_size)/10000.0 << "/" << static_cast<double>(total_capacity)/10000.0 << std::endl;
-				total_size = 0;
-				total_capacity = 0;
-			}
-
-
 
 			if(i == n-1 && data[j].second.shape() != process.shape()) {
 				throw std::runtime_error("Unexpected shape (actual: "+data[j].second.shape().to_string()+", expected: "+process.shape().to_string()+")");

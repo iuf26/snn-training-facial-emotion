@@ -27,5 +27,6 @@
     "pool1_s_w": 8,
     "pool1_s_h": 8,
 
+    "use_sparse": true,
     "svm_eval": false
 }

@@ -56,10 +56,16 @@ int main(int argc, char** argv) {
 	config["seed"] = seed;
 
 	// Initialize experiment
-	Experiment<DenseIntermediateExecution> experiment(argc, argv, output_path, config["exp_name"], seed);
+	AbstractExperiment* experiment;
+	if (config["use_sparse"] == true) {
+		experiment = new Experiment<SparseIntermediateExecution>(argc, argv, output_path, config["exp_name"], seed);
+	}
+	else {
+		experiment = new Experiment<DenseIntermediateExecution>(argc, argv, output_path, config["exp_name"], seed);
+	}
 
 	// Save config path to output path
-	std::ofstream output_config_file(output_path + "/csnn_config_"+experiment.name()+".json");
+	std::ofstream output_config_file(output_path + "/csnn_config_"+experiment->name()+".json");
 	std::string jsonString;
 	serializeJsonPretty(config, jsonString);
 	output_config_file << jsonString;
@@ -71,7 +77,7 @@ int main(int argc, char** argv) {
 		throw std::runtime_error("Require to define INPUT_PATH variable");
 	}
 	std::string input_path(input_path_ptr);
-	experiment.add_train<dataset::Cifar>(std::vector<std::string>({
+	experiment->add_train<dataset::Cifar>(std::vector<std::string>({
 		input_path+"data_batch_1.bin",
 		input_path+"data_batch_2.bin",
 		input_path+"data_batch_3.bin",
@@ -79,17 +85,17 @@ int main(int argc, char** argv) {
 		input_path+"data_batch_5.bin"
 	}));
 
-	experiment.add_test<dataset::Cifar>(std::vector<std::string>({
+	experiment->add_test<dataset::Cifar>(std::vector<std::string>({
 		input_path+"test_batch.bin"
 	}));
 
 	// Preprocessing
-	experiment.push<process::DefaultOnOffFilter>(config["dog_k"], config["dog_std1"], config["dog_std2"]);
-	experiment.push<process::FeatureScaling>();
-	experiment.push<LatencyCoding>();
+	experiment->push<process::DefaultOnOffFilter>(config["dog_k"], config["dog_std1"], config["dog_std2"]);
+	experiment->push<process::FeatureScaling>();
+	experiment->push<LatencyCoding>();
 
 	// Convolutional layer
-	auto& conv1 = experiment.push<layer::Convolution>(config["conv1_k_w"], config["conv1_k_h"], config["conv1_c"]);
+	auto& conv1 = experiment->push<layer::Convolution>(config["conv1_k_w"], config["conv1_k_h"], config["conv1_c"]);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(config["conv1_epochs"]);
 	conv1.parameter<float>("annealing").set(config["conv1_annealing"]);
@@ -111,24 +117,25 @@ int main(int argc, char** argv) {
 	}
 
 	// Pooling layer
-	auto& pool1 = experiment.push<layer::Pooling>(config["pool1_k_w"], config["pool1_k_h"], config["pool1_s_w"], config["pool1_s_h"]);
+	auto& pool1 = experiment->push<layer::Pooling>(config["pool1_k_w"], config["pool1_k_h"], config["pool1_s_w"], config["pool1_s_h"]);
 	pool1.set_name("pool1");
 
 	// Activity analysis
-	auto& conv1_activity = experiment.output<DefaultOutput>(conv1, 0.0, 1.0);
+	auto& conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_activity.add_analysis<analysis::Coherence>();
-	auto& pool1_activity = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+	auto& pool1_activity = experiment->output<DefaultOutput>(pool1, 0.0, 1.0);
 	pool1_activity.add_analysis<analysis::Activity>();
 
 	// Save features
-	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
+	auto& pool1_save = experiment->output<SpikeTiming>(pool1);
 	pool1_save.add_analysis<analysis::SaveOutputNumpy>(output_path);
 
 	// SVM evaluation
 	if (config["svm_eval"]) {
-		auto& pool1_out = experiment.output<DefaultOutput>(pool1, 0.0, 1.0);
+		auto& pool1_out = experiment->output<DefaultOutput>(pool1, 0.0, 1.0);
 		pool1_out.add_analysis<analysis::Svm>();
 	}
 
-	experiment.run(10000);
+	experiment->run(10000);
+	delete experiment;
 }

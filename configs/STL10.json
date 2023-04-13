@@ -1,8 +1,6 @@
 {
-    "app_name": "mnist",
-    "seed": 0,
-    "output_path": "./",
-
+    "exp_name": "stl10_pool1_4x4",
+    
     "dog_k": 7,
     "dog_std1": 1,
     "dog_std2": 2,

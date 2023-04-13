@@ -29,7 +29,7 @@ AbstractExperiment::AbstractExperiment(const std::string& output_path, const std
 	size_t version = 0;
 
 	while(true) {
-		std::string filename = _output_path + "/" + ("exp-" + _name + (version == 0 ? "" : "_" + std::to_string(version)) + ".txt");
+		std::string filename = _output_path + "/" + ("csnn_log_" + _name + (version == 0 ? "" : "_" + std::to_string(version)) + ".txt");
 		std::ifstream in_file(filename);
 		if(!in_file.good()) {
 			break;
@@ -49,7 +49,7 @@ AbstractExperiment::AbstractExperiment(const std::string& output_path, const std
 	_print << "Experiment " << _name << std::endl;
 
 	_log.add_output(std::cout);
-	std::string filename = _output_path + "/" + "exp-" +_name + ".txt";
+	std::string filename = _output_path + "/" + "csnn_log_" +_name + ".txt";
 	if(!_log.add_output<std::ofstream>(filename, std::ios::out).good()) {
 		throw std::runtime_error("Can't open file " + filename);
 	}
@@ -232,7 +232,7 @@ void AbstractExperiment::run(size_t refresh_interval) {
 #endif
 	process(refresh_interval);
 
-	//_save(_output_path + "/" + "param-"+_name);
+	//_save(_output_path + "/" + "csnn_param"+_name);
 
 	auto t_end = std::chrono::high_resolution_clock ::now();
 
@@ -425,7 +425,7 @@ void AbstractExperiment::_save(const std::string& filename) const {
 	std::ofstream file(filename, std::ios::out | std::ios::trunc | std::ios::binary);
 
 	if(!file.good()) {
-		throw std::runtime_error("Unable to open param-"+_name);
+		throw std::runtime_error("Unable to open csnn_param"+_name);
 	}
 /*
 	uint32_t preprocessing_size = _preprocessing.size();

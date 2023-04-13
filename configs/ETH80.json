@@ -1,7 +1,5 @@
 {
-    "app_name": "eth80gs",
-    "seed": 0,
-    "output_path": "./",
+    "exp_name": "eth80_pool1_8x8",
 
     "dog_k": 7,
     "dog_std1": 0.333,

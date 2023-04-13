@@ -19,7 +19,21 @@
 
 int main(int argc, char** argv) {
 
-	// Load CSNN config
+	// Random seed
+	int seed = 0;
+	const char* seed_ptr = std::getenv("SEED");
+	if(seed_ptr != nullptr) {
+		seed = std::stoi(seed_ptr);
+	}
+
+	// Output path
+	const char* output_path_ptr = std::getenv("OUTPUT_PATH");
+	if(output_path_ptr == nullptr) {
+		output_path_ptr = "./";
+	}
+	std::string output_path(output_path_ptr);
+
+	// Load config
 	const char* config_path_ptr = std::getenv("CONFIG_PATH");
 	if(config_path_ptr == nullptr) {
 		throw std::runtime_error("Require to define CONFIG_PATH variable");
@@ -38,16 +52,18 @@ int main(int argc, char** argv) {
 	if (error) {
 		throw std::runtime_error("Failed to parse JSON config");
 	}
-	// Copy config path to output path
-	std::string output_path(config["output_path"].as<const char*>());
-	std::ifstream  src(config_path, std::ios::binary);
-	std::ofstream  dst(output_path + "/config.json", std::ios::binary);
-	dst << src.rdbuf();
-    src.close();
-    dst.close();
+	// Add seed to config
+	config["seed"] = seed;
 
 	// Initialize experiment
-	Experiment<DenseIntermediateExecution> experiment(argc, argv, config["output_path"], config["app_name"], config["seed"]);
+	Experiment<DenseIntermediateExecution> experiment(argc, argv, output_path, config["exp_name"], seed);
+
+	// Save config path to output path
+	std::ofstream output_config_file(output_path + "/csnn_config_"+experiment.name()+".json");
+	std::string jsonString;
+	serializeJsonPretty(config, jsonString);
+	output_config_file << jsonString;
+	output_config_file.close();
 
 	// Load dataset
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
@@ -106,7 +122,7 @@ int main(int argc, char** argv) {
 
 	// Save features
 	auto& pool1_save = experiment.output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>(config["output_path"].as<const char*>());
+	pool1_save.add_analysis<analysis::SaveOutputNumpy>(output_path);
 
 	// SVM evaluation
 	if (config["svm_eval"]) {

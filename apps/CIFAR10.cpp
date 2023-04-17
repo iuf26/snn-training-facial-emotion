@@ -116,11 +116,21 @@ int main(int argc, char** argv) {
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(config["conv1_w_init_mean"], config["conv1_w_init_std"]);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(config["conv1_th"].as<float>());
 	std::string stdp_type(config["conv1_stdp"].as<const char*>());
+	float ap;
+	float am;
+	if (config["conv1_stdp_lr"].is<JsonArray>()) {
+		ap = config["conv1_stdp_lr"][0];
+		am = config["conv1_stdp_lr"][1];
+	}
+	else {
+		ap = config["conv1_stdp_lr"];
+		am = config["conv1_stdp_lr"];		
+	}
 	if (stdp_type == "multiplicative") {
-		conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(config["conv1_stdp_lr"], config["conv1_stdp_b"]);
+		conv1.parameter<STDP>("stdp").set<stdp::Multiplicative>(ap, am, config["conv1_stdp_b"]);
 	}
 	else if (stdp_type == "biological") {
-		conv1.parameter<STDP>("stdp").set<stdp::Biological>(config["conv1_stdp_lr"], config["conv1_stdp_t"]);
+		conv1.parameter<STDP>("stdp").set<stdp::Biological>(ap, am, config["conv1_stdp_t"]);
 	}
 	else {
 		throw std::runtime_error("STDP type " + stdp_type + " is not implemented");

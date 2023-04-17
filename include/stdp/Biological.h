@@ -9,12 +9,13 @@ namespace stdp {
 
 	public:
 		Biological();
-		Biological(float alpha, Time tau);
+		Biological(float ap, float am, Time tau);
 
 		virtual float process(float w, const Time pre, Time post);
 		virtual void adapt_parameters(float factor);
 	private:
-		float _alpha;
+		float _ap;
+		float _am;
 		float _tau;
 	};
 

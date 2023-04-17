@@ -86,7 +86,17 @@ int main(int argc, char** argv) {
 	experiment->push<LatencyCoding>();
 
 	// Convolutional layer
-	auto& conv1 = experiment->push<layer::Convolution>(config["conv1_k_w"], config["conv1_k_h"], config["conv1_c"]);
+	int conv1_k_w;
+	int conv1_k_h;
+	if (config.containsKey("conv1_k")) {
+		conv1_k_w = config["conv1_k"];
+		conv1_k_h = config["conv1_k"];
+	}
+	else {
+		conv1_k_w = config["conv1_k_w"];
+		conv1_k_h = config["conv1_k_h"];
+	}
+	auto& conv1 = experiment->push<layer::Convolution>(conv1_k_w, conv1_k_h, config["conv1_c"]);
 	conv1.set_name("conv1");
 	conv1.parameter<uint32_t>("epoch").set(config["conv1_epochs"]);
 	conv1.parameter<float>("annealing").set(config["conv1_annealing"]);

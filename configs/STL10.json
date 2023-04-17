@@ -6,8 +6,7 @@
     "dog_std2": 2,
 
     "conv1_c": 64,
-    "conv1_k_w": 5,
-    "conv1_k_h": 5,
+    "conv1_k": 5,
     "conv1_epochs": 200,
     "conv1_annealing": 0.95,
     "conv1_min_th": 4,

@@ -2,8 +2,7 @@
     "exp_name": "eth80_pool1_8x8",
 
     "dog_k": 7,
-    "dog_std1": 0.333,
-    "dog_std2": 0.666,
+    "dog_stds": [0.333,0.666],
 
     "conv1_c": 64,
     "conv1_k_w": 7,

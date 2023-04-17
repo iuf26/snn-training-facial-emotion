@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
 	}));
 
 	// Preprocessing
-	experiment->push<process::DefaultOnOffFilter>(config["dog_k"], config["dog_std1"], config["dog_std2"]);
+	experiment->push<process::DefaultOnOffFilter>(config["dog_k"], config["dog_stds"][0], config["dog_stds"][1]);
 	experiment->push<process::FeatureScaling>();
 	experiment->push<LatencyCoding>();
 

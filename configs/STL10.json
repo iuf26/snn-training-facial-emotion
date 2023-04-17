@@ -2,8 +2,7 @@
     "exp_name": "stl10_pool1_4x4",
     
     "dog_k": 7,
-    "dog_std1": 1,
-    "dog_std2": 2,
+    "dog_stds": [1,2],
 
     "conv1_c": 64,
     "conv1_k": 5,

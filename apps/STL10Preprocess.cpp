@@ -16,6 +16,10 @@
 #include "process/Pooling.h"
 #include "process/GrayScale.h"
 #include "process/OnOffFilter.h"
+#include "process/Whiten.h"
+#include "process/WhitenPatches.h"
+#include "process/SeparateSign.h"
+
 
 int main(int argc, char** argv) {
 
@@ -76,8 +80,10 @@ int main(int argc, char** argv) {
 	experiment->add_test<dataset::STL>(input_path+"test_X.bin", input_path+"test_y.bin");
 
 	// Preprocessing
-	experiment->push<process::GrayScale>();
-	experiment->push<process::DefaultOnOffFilter>(7, config["dog_stds"][0], config["dog_stds"][1]);
+	experiment->push<process::WhiteningPatches>(9, 0.01, 0.15, 2, 1000000);
+	experiment->push<process::SeparateSign>();
+	//experiment->push<process::GrayScale>();
+	//experiment->push<process::DefaultOnOffFilter>(7, config["dog_stds"][0], config["dog_stds"][1]);
 	if (config["feature_scaling"]) {
 		experiment->push<process::FeatureScaling>();
 	}

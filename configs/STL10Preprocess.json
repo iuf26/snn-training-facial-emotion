@@ -1,0 +1,8 @@
+{
+    "exp_name": "dog",
+    
+    "dog_k": 7,
+    "dog_stds": [1,2],
+
+    "feature_scaling": true
+}

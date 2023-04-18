@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
 	experiment->add_test<dataset::STL>(input_path+"test_X.bin", input_path+"test_y.bin");
 
 	// Preprocessing
+	experiment->push<process::GrayScale>();
 	experiment->push<process::DefaultOnOffFilter>(config["dog_k"], config["dog_stds"][0], config["dog_stds"][1]);
 	experiment->push<process::FeatureScaling>();
 	experiment->push<LatencyCoding>();

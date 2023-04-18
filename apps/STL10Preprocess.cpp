@@ -59,6 +59,13 @@ int main(int argc, char** argv) {
 	AbstractExperiment* experiment;
 	experiment = new Experiment<DenseIntermediateExecution>(argc, argv, output_path, config["exp_name"], seed);
 
+	// Save config path to output path
+	std::ofstream output_config_file(output_path + "/csnn_config_"+experiment->name()+".json");
+	std::string jsonString;
+	serializeJsonPretty(config, jsonString);
+	output_config_file << jsonString;
+	output_config_file.close();
+
 	// Load dataset
 	const char* input_path_ptr = std::getenv("INPUT_PATH");
 	if(input_path_ptr == nullptr) {
@@ -69,11 +76,12 @@ int main(int argc, char** argv) {
 	experiment->add_test<dataset::STL>(input_path+"test_X.bin", input_path+"test_y.bin");
 
 	// Preprocessing
+	experiment->push<process::GrayScale>();
 	experiment->push<process::DefaultOnOffFilter>(7, config["dog_stds"][0], config["dog_stds"][1]);
 	if (config["feature_scaling"]) {
 		experiment->push<process::FeatureScaling>();
 	}
-	experiment->push<LatencyCoding>();
+	//experiment->push<LatencyCoding>();
 
 	// Pooling layer
 	auto& pool1 = experiment->push<layer::Pooling>(1, 1, 1, 1);

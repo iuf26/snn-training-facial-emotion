@@ -117,11 +117,15 @@ int main(int argc, char** argv) {
     load_dataset(experiment, input_path, dataset_name);
 
 	// Preprocessing
-	experiment->push<process::GrayScale>();
+	if (!config.containsKey("to_grayscale") || config["to_grayscale"] == true) {
+		experiment->push<process::GrayScale>();
+	}
 	if (!config["dog"].isNull()) {
 		experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
 	}
-	experiment->push<process::FeatureScaling>();
+	if (!config.containsKey("feature_scaling") || config["feature_scaling"] == true) {
+		experiment->push<process::FeatureScaling>();
+	}
 	experiment->push<LatencyCoding>();
 
 	// Convolutional layer

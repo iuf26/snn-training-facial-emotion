@@ -20,16 +20,14 @@
 #include "Logger.h"
 #include "Monitor.h"
 
-#include "dep/ArduinoJson-v6.17.3.h"
-
 class AbstractExperiment {
 
 	friend class InputLayer;
 	friend class Layer;
 
 public:
-	AbstractExperiment(const std::string& output_path, const std::string& name, int seed);
-	AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed);
+	AbstractExperiment(const std::string& output_path, const std::string& name, int seed, bool log_to_file);
+	AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, bool log_to_file);
 	AbstractExperiment(const AbstractExperiment& that) = delete;
 	virtual ~AbstractExperiment();
 
@@ -201,14 +199,14 @@ class Experiment : public AbstractExperiment {
 
 public:
 	template<typename... Args>
-	Experiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, Args&&... args) :
-		AbstractExperiment(argc, argv, output_path, name, seed), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
+	Experiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
+		AbstractExperiment(argc, argv, output_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
 
 	}
 
 	template<typename... Args>
-	Experiment(const std::string& output_path, const std::string& name, int seed, Args&&... args) :
-		AbstractExperiment(output_path, name, seed), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
+	Experiment(const std::string& output_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
+		AbstractExperiment(output_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
 	}
 
 	virtual void process(size_t refresh_interval) {

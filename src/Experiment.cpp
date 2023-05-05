@@ -2,18 +2,18 @@
 
 
 #ifdef ENABLE_QT
-AbstractExperiment::AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed) :
-	AbstractExperiment(output_path, name, seed) {
+AbstractExperiment::AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, bool log_to_file) :
+	AbstractExperiment(output_path, name, seed, log_to_file) {
 	_app = new QApplication(argc, argv);
 }
 #else
-AbstractExperiment::AbstractExperiment(int&, char**, const std::string& output_path, const std::string& name, int seed) :
-	AbstractExperiment(output_path, name, seed) {
+AbstractExperiment::AbstractExperiment(int&, char**, const std::string& output_path, const std::string& name, int seed, bool log_to_file) :
+	AbstractExperiment(output_path, name, seed, log_to_file) {
 
 }
 #endif
 
-AbstractExperiment::AbstractExperiment(const std::string& output_path, const std::string& name, int seed) :
+AbstractExperiment::AbstractExperiment(const std::string& output_path, const std::string& name, int seed, bool log_to_file) :
 #ifdef ENABLE_QT
 	_app(nullptr),
 #endif
@@ -49,9 +49,11 @@ AbstractExperiment::AbstractExperiment(const std::string& output_path, const std
 	_print << "Experiment " << _name << std::endl;
 
 	_log.add_output(std::cout);
-	std::string filename = _output_path + "/" + "csnn_log_" +_name + ".txt";
-	if(!_log.add_output<std::ofstream>(filename, std::ios::out).good()) {
-		throw std::runtime_error("Can't open file " + filename);
+	if (log_to_file) {
+		std::string filename = _output_path + "/" + "csnn_log_" +_name + ".txt";
+		if(!_log.add_output<std::ofstream>(filename, std::ios::out).good()) {
+			throw std::runtime_error("Can't open file " + filename);
+		}
 	}
 	_print_date(_log) << std::endl;
 	_log << "Random seed: " << _seed << std::endl;

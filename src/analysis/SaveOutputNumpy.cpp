@@ -5,7 +5,7 @@ using namespace analysis;
 static RegisterClassParameter<SaveOutputNumpy, AnalysisFactory> _register("SaveOutputNumpy");
 
 SaveOutputNumpy::SaveOutputNumpy() : UniquePassAnalysis(_register),
-	_path(), _data_train(), _data_test(), _label_train(), _label_test(),
+	_path("./"), _data_train(), _data_test(), _label_train(), _label_test(),
     _train_sample_cnt(0), _test_sample_cnt(0), _width(0), _height(0), _depth(0) {
 	throw std::runtime_error("Unimplemented");
 }

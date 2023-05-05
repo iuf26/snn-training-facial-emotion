@@ -66,13 +66,14 @@ void Coherence::process() {
 
 			std::sort(std::begin(list), std::end(list));
 
+			experiment().log() << "Mean weights: " << mean_w << std::endl;
+			experiment().log() << "------" << std::endl;
 			experiment().log() << "N: " << list.size() << std::endl;
 			experiment().log() << "Min: " << list.front() << std::endl;
 			experiment().log() << "Q1: " << list.at(std::min(list.size()-1, (list.size()*1)/4)) << std::endl;
 			experiment().log() << "Q2: " << list.at(std::min(list.size()-1, (list.size()*2)/4)) << std::endl;
 			experiment().log() << "Q3: " << list.at(std::min(list.size()-1, (list.size()*3)/4)) << std::endl;
 			experiment().log() << "Max: " << list.back() << std::endl;
-			experiment().log() << "Mean weights: " << mean_w << std::endl;
 		}
 		else {
 			experiment().log() << "Incompatible w shape." << std::endl;

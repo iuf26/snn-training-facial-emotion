@@ -1,6 +1,5 @@
 {
     "dataset": "STL10",
-    "exp_name": "conv-pool",
 
     "dog": [7,1,2],
 
@@ -22,6 +21,5 @@
 
     "pool1_size": 4,
 
-    "use_sparse": false,
-    "svm_eval": false
+    "use_sparse": false
 }

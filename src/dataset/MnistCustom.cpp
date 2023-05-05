@@ -29,10 +29,10 @@ std::pair<std::string, Tensor<InputType>> MnistCustom::next() {
 	for(size_t x=0; x<MNISTC_WIDTH; x++) {
 		for(size_t y=0; y<MNISTC_HEIGHT; y++) {
 			for(size_t z=0; z<MNISTC_DEPTH; z++) {
-				float pixel;
-				_image_file.read((char*)&pixel, sizeof(float));
+				uint8_t pixel;
+				_image_file.read((char*)&pixel, sizeof(uint8_t));
 
-				out.second.at(x, y, z) = static_cast<InputType>(pixel);
+				out.second.at(x, y, z) = static_cast<InputType>(pixel)/static_cast<InputType>(std::numeric_limits<uint8_t>::max());
 			}
 		}
 	}

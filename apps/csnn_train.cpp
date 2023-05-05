@@ -1,6 +1,7 @@
 #include "Experiment.h"
 #include "dataset/Cifar.h"
 #include "dataset/Cifar10.h"
+#include "dataset/Mnist.h"
 #include "dataset/MnistCustom.h"
 #include "dataset/ETH.h"
 #include "dataset/STL.h"

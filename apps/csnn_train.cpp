@@ -1,7 +1,7 @@
 #include "Experiment.h"
 #include "dataset/Cifar.h"
 #include "dataset/Cifar10.h"
-#include "dataset/Mnist.h"
+#include "dataset/MnistCustom.h"
 #include "dataset/ETH.h"
 #include "dataset/STL.h"
 #include "stdp/Multiplicative.h"
@@ -26,7 +26,7 @@
 
 void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::string& label_path, std::string& dataset) {
     if (dataset == "MNIST") {
-		experiment->add_train<dataset::Mnist>(data_path, label_path);
+		experiment->add_train<dataset::MnistCustom>(data_path, label_path);
     }
     else if (dataset == "CIFAR10") {
 		experiment->add_train<dataset::Cifar10>(data_path, label_path);

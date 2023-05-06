@@ -1,10 +1,5 @@
 #include "Experiment.h"
-#include "dataset/Cifar.h"
-#include "dataset/Cifar10.h"
-#include "dataset/Mnist.h"
-#include "dataset/MnistCustom.h"
-#include "dataset/ETH.h"
-#include "dataset/STL.h"
+#include "dataset/ImageBin.h"
 #include "stdp/Multiplicative.h"
 #include "stdp/Biological.h"
 #include "layer/Convolution.h"
@@ -26,21 +21,33 @@
 
 
 void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::string& label_path, std::string& dataset) {
-    if (dataset == "MNIST") {
-		experiment->add_train<dataset::MnistCustom>(data_path, label_path);
+    int width = 0;
+	int height = 0;
+	int depth = 0;
+	if (dataset == "MNIST") {
+		width = 28;
+		height = 28;
+		depth = 1;
     }
     else if (dataset == "CIFAR10") {
-		experiment->add_train<dataset::Cifar10>(data_path, label_path);
+		width = 32;
+		height = 32;
+		depth = 3;
 	}
     else if (dataset == "STL10") {
-        experiment->add_train<dataset::STL>(data_path, label_path);
+		width = 96;
+		height = 96;
+		depth = 3;
     }
     else if (dataset == "ETH80") {
-		experiment->add_train<dataset::ETH>(data_path, label_path);
+		width = 100;
+		height = 100;
+		depth = 3;
     }
     else {
         throw std::runtime_error("Dataset loader for " + dataset + " is not implemented");
     }
+	experiment->add_train<dataset::ImageBin>(data_path, label_path, width, height, depth, dataset);
 }
 
 

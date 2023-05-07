@@ -16,8 +16,25 @@
 #include "process/Pooling.h"
 #include "process/GrayScale.h"
 #include "process/OnOffFilter.h"
+#include "process/WhitenPatchesLoader.h"
+#include "process/SeparateSign.h"
 #include "dep/filesystem.hpp"
 #include "dep/ArduinoJson-v6.17.3.h"
+
+
+// NOTE: works on linux only, temporary solution
+std::string get_build_path() {
+	// Get the absolute path to the executable
+	char self[PATH_MAX] = { 0 };
+	int nchar = readlink("/proc/self/exe", self, sizeof self);
+	std::string path = std::string(self);
+	// Remove the name of the executable from the path
+    std::size_t pos = path.find_last_of("/");
+    if (pos != std::string::npos) {
+        path = path.substr(0, pos);
+    }
+    return path;
+}
 
 
 void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::string& label_path, std::string& dataset) {
@@ -98,11 +115,18 @@ int main(int argc, char** argv) {
 	load_dataset(experiment, data_path, label_path, dataset_name);
 
 	// Preprocessing
-	if (!config.containsKey("to_grayscale") || config["to_grayscale"] == true) {
-		experiment->push<process::GrayScale>();
+	// NOTE: Not very robust for now... to be changed
+	if (config.containsKey("whiten") && config["whiten"] == true) {
+		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/whiten-filters/" + dataset_name);
+		experiment->push<process::SeparateSign>();
 	}
-	if (!config["dog"].isNull()) {
-		experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
+	else {
+		if (!config.containsKey("to_grayscale") || config["to_grayscale"] == true) {
+			experiment->push<process::GrayScale>();
+		}
+		if (!config["dog"].isNull()) {
+			experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
+		}
 	}
 	//if (!config.containsKey("feature_scaling") || config["feature_scaling"] == true) {
 	//	experiment->push<process::FeatureScaling>();

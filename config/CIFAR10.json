@@ -1,7 +1,7 @@
 {
     "dataset": "CIFAR10",
 
-    "dog": [7,1,2],
+    "whiten": true,
 
     "conv1_c": 64,
     "conv1_k": 5,

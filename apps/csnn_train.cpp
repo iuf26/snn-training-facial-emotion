@@ -86,6 +86,7 @@ int main(int argc, char** argv) {
 		seed = std::stoi(argv[5]);
 	}
 	ghc::filesystem::create_directories(output_path);
+	ghc::filesystem::create_directories(output_path+"/model/");
 
 	// Load config
 	std::ifstream _jsonTextFile(config_path);
@@ -115,7 +116,7 @@ int main(int argc, char** argv) {
 	}
 
 	// Save config path to output path
-	std::ofstream output_config_file(output_path + "/csnn_config_"+experiment->name()+".json");
+	std::ofstream output_config_file(output_path + "/model/config.json");
 	std::string jsonString;
 	serializeJsonPretty(config, jsonString);
 	output_config_file << jsonString;
@@ -193,7 +194,7 @@ int main(int argc, char** argv) {
 
 	// Save weights and thresholds 
 	auto& conv1_save = experiment->output<SpikeTiming>(conv1);
-	conv1_save.add_analysis<analysis::SaveLayer>(output_path + "model/");
+	conv1_save.add_analysis<analysis::SaveLayer>(output_path + "/model/conv1/");
 
 	// Activity analysis
 	auto& conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);

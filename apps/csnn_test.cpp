@@ -71,22 +71,21 @@ void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::s
 int main(int argc, char** argv) {
 
 	// Argument parsing
-    if (argc < 5 || argc > 6) {
-		throw std::runtime_error("Usage: " + std::string(argv[0]) + " <DATA_PATH> <LABEL_PATH> <CONFIG_PATH> <MODEL_PATH> [ <OUTPUT_PATH = ./> ]");
+    if (argc < 4 || argc > 5) {
+		throw std::runtime_error("Usage: " + std::string(argv[0]) + " <DATA_PATH> <LABEL_PATH> <MODEL_PATH> [ <OUTPUT_PATH = ./> ]");
     }
 
     std::string data_path = std::string(argv[1]);
 	std::string label_path = std::string(argv[2]);
-	std::string config_path = std::string(argv[3]);
-	std::string model_path = std::string(argv[4]);
+	std::string model_path = std::string(argv[3]);
 	std::string output_path = "./";
 	if (argc > 5) {
-		output_path = std::string(argv[5]);
+		output_path = std::string(argv[4]);
 	}
 	ghc::filesystem::create_directories(output_path);
 
 	// Load config
-	std::ifstream _jsonTextFile(config_path);
+	std::ifstream _jsonTextFile(model_path+"/config.json");
 	if (!_jsonTextFile.good()) {
 		throw std::runtime_error("Failed to open JSON config");
 	}
@@ -146,7 +145,7 @@ int main(int argc, char** argv) {
 	}
 	auto& conv1 = experiment->push<layer::Convolution>(conv1_k_w, conv1_k_h, config["conv1_c"]);
 	conv1.set_name("conv1");
-	conv1.use_trained_model(model_path);
+	conv1.use_trained_model(model_path+"/conv1/");
 	conv1.parameter<uint32_t>("epoch").set(0);
 	conv1.parameter<float>("annealing").set(config["conv1_annealing"]);
 	conv1.parameter<float>("min_th").set(config["conv1_min_th"]);

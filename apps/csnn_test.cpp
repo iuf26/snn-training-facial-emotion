@@ -64,7 +64,7 @@ void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::s
     else {
         throw std::runtime_error("Dataset loader for " + dataset + " is not implemented");
     }
-	experiment->add_train<dataset::ImageBin>(data_path, label_path, width, height, depth, dataset);
+	experiment->add_test<dataset::ImageBin>(data_path, label_path, width, height, depth, dataset);
 }
 
 
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 	std::string label_path = std::string(argv[2]);
 	std::string model_path = std::string(argv[3]);
 	std::string output_path = "./";
-	if (argc > 5) {
+	if (argc > 4) {
 		output_path = std::string(argv[4]);
 	}
 	ghc::filesystem::create_directories(output_path);

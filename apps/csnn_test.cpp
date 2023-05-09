@@ -7,8 +7,7 @@
 #include "Distribution.h"
 #include "execution/TestingExecution.h"
 #include "execution/TestingSparseExecution.h"
-#include "analysis/SaveLayer.h"
-#include "analysis/SaveOutputNumpy.h"
+#include "analysis/SaveFeatureNumpy.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
 #include "process/Input.h"
@@ -18,14 +17,13 @@
 #include "process/OnOffFilter.h"
 #include "process/WhitenPatchesLoader.h"
 #include "process/SeparateSign.h"
-#include "dep/filesystem.hpp"
 #include "dep/ArduinoJson-v6.17.3.h"
 
 
-// NOTE: works on linux only, temporary solution
+// NOTE: TEMPORARY... Find a better solution (works on Linux only)
 std::string get_build_path() {
 	// Get the absolute path to the executable
-	char self[PATH_MAX] = { 0 };
+	char self[4096] = { 0 };
 	int nchar = readlink("/proc/self/exe", self, sizeof self);
 	std::string path = std::string(self);
 	// Remove the name of the executable from the path
@@ -37,6 +35,7 @@ std::string get_build_path() {
 }
 
 
+// NOTE: TEMPORARY... Find a better solution 
 void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::string& label_path, std::string& dataset) {
     int width = 0;
 	int height = 0;
@@ -82,7 +81,6 @@ int main(int argc, char** argv) {
 	if (argc > 4) {
 		output_path = std::string(argv[4]);
 	}
-	ghc::filesystem::create_directories(output_path);
 
 	// Load config
 	std::ifstream _jsonTextFile(model_path+"/config.json");
@@ -103,10 +101,10 @@ int main(int argc, char** argv) {
 	AbstractExperiment* experiment;
 	std::string exp_name = "test";
 	if (config["use_sparse"] == true) {
-		experiment = new Experiment<TestingExecution>(argc, argv, output_path, exp_name, 0, false);
+		experiment = new Experiment<TestingSparseExecution>(argc, argv, output_path, model_path, exp_name, 0, false);
 	}
 	else {
-		experiment = new Experiment<TestingSparseExecution>(argc, argv, output_path, exp_name, 0, false);
+		experiment = new Experiment<TestingExecution>(argc, argv, output_path, model_path, exp_name, 0, false);
 	}
 
 	// Load dataset
@@ -114,22 +112,21 @@ int main(int argc, char** argv) {
 	load_dataset(experiment, data_path, label_path, dataset_name);
 
 	// Preprocessing
-	// NOTE: Not very robust for now... to be changed
 	if (config.containsKey("whiten") && config["whiten"] == true) {
 		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/whiten-filters/" + dataset_name);
 		experiment->push<process::SeparateSign>();
 	}
 	else {
-		if (!config.containsKey("to_grayscale") || config["to_grayscale"] == true) {
+		if (config["to_grayscale"] == true) {
 			experiment->push<process::GrayScale>();
 		}
 		if (!config["dog"].isNull()) {
 			experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
 		}
 	}
-	//if (!config.containsKey("feature_scaling") || config["feature_scaling"] == true) {
-	//	experiment->push<process::FeatureScaling>();
-	//}
+	if (config["feature_scaling"] == true) {
+		experiment->push<process::FeatureScaling>();
+	}
 	experiment->push<LatencyCoding>();
 
 	// Convolutional layer
@@ -145,7 +142,6 @@ int main(int argc, char** argv) {
 	}
 	auto& conv1 = experiment->push<layer::Convolution>(conv1_k_w, conv1_k_h, config["conv1_c"]);
 	conv1.set_name("conv1");
-	conv1.use_trained_model(model_path+"/conv1/");
 	conv1.parameter<uint32_t>("epoch").set(0);
 	conv1.parameter<float>("annealing").set(config["conv1_annealing"]);
 	conv1.parameter<float>("min_th").set(config["conv1_min_th"]);
@@ -180,12 +176,14 @@ int main(int argc, char** argv) {
 	pool1.set_name("pool1");
 
 	// Activity analysis
+	auto& conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);
+	conv1_activity.add_analysis<analysis::Coherence>();
 	auto& pool1_activity = experiment->output<DefaultOutput>(pool1, 0.0, 1.0);
 	pool1_activity.add_analysis<analysis::Activity>();
 	
 	// Save feature maps
 	auto& pool1_save = experiment->output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>(output_path);
+	pool1_save.add_analysis<analysis::SaveFeatureNumpy>(output_path);
 
 	experiment->run(10000);
 	delete experiment;

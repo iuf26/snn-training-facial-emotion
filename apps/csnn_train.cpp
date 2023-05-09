@@ -7,8 +7,7 @@
 #include "Distribution.h"
 #include "execution/TrainingExecution.h"
 #include "execution/TrainingSparseExecution.h"
-#include "analysis/SaveLayer.h"
-#include "analysis/SaveOutputNumpy.h"
+#include "analysis/SaveFeatureNumpy.h"
 #include "analysis/Activity.h"
 #include "analysis/Coherence.h"
 #include "process/Input.h"
@@ -18,14 +17,13 @@
 #include "process/OnOffFilter.h"
 #include "process/WhitenPatchesLoader.h"
 #include "process/SeparateSign.h"
-#include "dep/filesystem.hpp"
 #include "dep/ArduinoJson-v6.17.3.h"
 
 
-// NOTE: works on linux only, temporary solution
+// NOTE: TEMPORARY... Find a better solution (works on Linux only)
 std::string get_build_path() {
 	// Get the absolute path to the executable
-	char self[PATH_MAX] = { 0 };
+	char self[4096] = { 0 };
 	int nchar = readlink("/proc/self/exe", self, sizeof self);
 	std::string path = std::string(self);
 	// Remove the name of the executable from the path
@@ -37,6 +35,7 @@ std::string get_build_path() {
 }
 
 
+// NOTE: TEMPORARY... Find a better solution 
 void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::string& label_path, std::string& dataset) {
     int width = 0;
 	int height = 0;
@@ -85,8 +84,6 @@ int main(int argc, char** argv) {
 	if (argc > 5) {
 		seed = std::stoi(argv[5]);
 	}
-	ghc::filesystem::create_directories(output_path);
-	ghc::filesystem::create_directories(output_path+"/model/");
 
 	// Load config
 	std::ifstream _jsonTextFile(config_path);
@@ -108,15 +105,17 @@ int main(int argc, char** argv) {
 	// Initialize experiment
 	AbstractExperiment* experiment;
 	std::string exp_name = "train";
+	std::string model_path = output_path + "/model/";
 	if (config["use_sparse"] == true) {
-		experiment = new Experiment<TrainingExecution>(argc, argv, output_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingSparseExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
 	}
 	else {
-		experiment = new Experiment<TrainingSparseExecution>(argc, argv, output_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
 	}
 
-	// Save config path to output path
-	std::ofstream output_config_file(output_path + "/model/config.json");
+	// Save config path to the model directory
+	// NOTE: TEMPORARY... Find a better solution
+	std::ofstream output_config_file(model_path + "/config.json");
 	std::string jsonString;
 	serializeJsonPretty(config, jsonString);
 	output_config_file << jsonString;
@@ -127,22 +126,21 @@ int main(int argc, char** argv) {
 	load_dataset(experiment, data_path, label_path, dataset_name);
 
 	// Preprocessing
-	// NOTE: Not very robust for now... to be changed
 	if (config.containsKey("whiten") && config["whiten"] == true) {
 		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/whiten-filters/" + dataset_name);
 		experiment->push<process::SeparateSign>();
 	}
 	else {
-		if (!config.containsKey("to_grayscale") || config["to_grayscale"] == true) {
+		if (config["to_grayscale"] == true) {
 			experiment->push<process::GrayScale>();
 		}
 		if (!config["dog"].isNull()) {
 			experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
 		}
 	}
-	//if (!config.containsKey("feature_scaling") || config["feature_scaling"] == true) {
-	//	experiment->push<process::FeatureScaling>();
-	//}
+	if (config["feature_scaling"] == true) {
+		experiment->push<process::FeatureScaling>();
+	}
 	experiment->push<LatencyCoding>();
 
 	// Convolutional layer
@@ -191,11 +189,6 @@ int main(int argc, char** argv) {
 	auto& pool1 = experiment->push<layer::Pooling>(config["pool1_size"], config["pool1_size"], config["pool1_size"], config["pool1_size"]);
 	pool1.set_name("pool1");
 
-
-	// Save weights and thresholds 
-	auto& conv1_save = experiment->output<SpikeTiming>(conv1);
-	conv1_save.add_analysis<analysis::SaveLayer>(output_path + "/model/conv1/");
-
 	// Activity analysis
 	auto& conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_activity.add_analysis<analysis::Coherence>();
@@ -204,7 +197,7 @@ int main(int argc, char** argv) {
 	
 	// Save feature maps
 	auto& pool1_save = experiment->output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveOutputNumpy>(output_path);
+	pool1_save.add_analysis<analysis::SaveFeatureNumpy>(output_path);
 
 	experiment->run(10000);
 	delete experiment;

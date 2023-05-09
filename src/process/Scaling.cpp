@@ -40,6 +40,39 @@ void FeatureScaling::process_test(const std::string&, Tensor<float>& sample) {
 	}
 }
 
+bool FeatureScaling::save_params(const std::string& path) {
+	std::vector<float> mins;
+	std::vector<float> maxs;
+	for(size_t i=0; i<_size; i++) {
+		mins.emplace_back(_min.at_index(i));
+		maxs.emplace_back(_max.at_index(i));
+	}
+	const bool fortran_order{false};
+	const std::vector<long unsigned> shape{_size};
+	npy::SaveArrayAsNumpy(path + "/mins.npy", fortran_order, shape.size(), shape.data(), mins);
+	npy::SaveArrayAsNumpy(path + "/maxs.npy", fortran_order, shape.size(), shape.data(), maxs);
+	return true;
+}
+
+bool FeatureScaling::load_params(const std::string& path) {
+	bool fortran_order = false;
+	std::vector<long unsigned> shape{_size};
+	// Mins
+	std::vector<float> mins;
+	npy::LoadArrayFromNumpy(path + "/mins.npy", shape, fortran_order, mins);
+	for(size_t i=0; i<_size; i++) {
+		_min.at_index(i) = mins.at(i);
+	}
+	// Maxs
+	std::vector<float> maxs;
+	npy::LoadArrayFromNumpy(path + "/maxs.npy", shape, fortran_order, maxs);
+	for(size_t i=0; i<_size; i++) {
+		_max.at_index(i) = maxs.at(i);
+	}
+	return true;
+}
+
+
 //
 //	ChannelScaling
 //

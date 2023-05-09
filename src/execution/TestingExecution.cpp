@@ -16,6 +16,17 @@ void TestingExecution::process(size_t refresh_interval) {
 		}
 		_experiment.print() << std::endl;
 
+		// Load trained parameters
+		std::string process_load_path = _experiment.model_path() + "/" + _experiment.process_at(i).factory_name() + "." + _experiment.process_at(i).class_name();
+		if (!_experiment.process_at(i).name().empty()) {
+			process_load_path += "." + _experiment.process_at(i).name();
+		}
+		process_load_path += "/";
+		bool loaded = _experiment.process_at(i).load_params(process_load_path);
+		if (loaded) {
+			_experiment.log() << "Load trained parameters at " << process_load_path << std::endl;
+		}
+
 		_process_test_data(_experiment.process_at(i), _test_set);
 		_process_output(i);
 	}

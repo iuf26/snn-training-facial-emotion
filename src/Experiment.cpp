@@ -2,22 +2,22 @@
 
 
 #ifdef ENABLE_QT
-AbstractExperiment::AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, bool log_to_file) :
-	AbstractExperiment(output_path, name, seed, log_to_file) {
+AbstractExperiment::AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file) :
+	AbstractExperiment(output_path, model_path, name, seed, log_to_file) {
 	_app = new QApplication(argc, argv);
 }
 #else
-AbstractExperiment::AbstractExperiment(int&, char**, const std::string& output_path, const std::string& name, int seed, bool log_to_file) :
-	AbstractExperiment(output_path, name, seed, log_to_file) {
+AbstractExperiment::AbstractExperiment(int&, char**, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file) :
+	AbstractExperiment(output_path, model_path, name, seed, log_to_file) {
 
 }
 #endif
 
-AbstractExperiment::AbstractExperiment(const std::string& output_path, const std::string& name, int seed, bool log_to_file) :
+AbstractExperiment::AbstractExperiment(const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file) :
 #ifdef ENABLE_QT
 	_app(nullptr),
 #endif
-	_logger(), _log(_logger.create()), _print(_logger.create()), _output_path(output_path), _name(name), _seed(seed), _random_generator(),
+	_logger(), _log(_logger.create()), _print(_logger.create()), _output_path(output_path), _model_path(model_path), _name(name), _seed(seed), _random_generator(),
 	_input_shape(nullptr), _time_limit(1.0), _train_data(), _test_data(), _process_list(),
 #ifdef ENABLE_QT
 	_plots(),
@@ -27,6 +27,9 @@ AbstractExperiment::AbstractExperiment(const std::string& output_path, const std
 	_print.add_output(std::cout);
 
 	size_t version = 0;
+
+	// Create output directory if it does not exist
+	mkdir(output_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 
 	while(true) {
 		std::string filename = _output_path + "/" + ("csnn_log_" + _name + (version == 0 ? "" : "_" + std::to_string(version)) + ".txt");
@@ -327,6 +330,14 @@ const std::vector<Input*>& AbstractExperiment::train_data() const {
 
 const std::vector<Input*>& AbstractExperiment::test_data() const {
 	return _test_data;
+}
+
+const std::string& AbstractExperiment::output_path() const {
+	return _output_path;
+}
+
+const std::string& AbstractExperiment::model_path() const {
+	return _model_path;
 }
 
 /*const std::vector<Process*>& AbstractExperiment::preprocessing() const {

@@ -4,6 +4,8 @@
 TrainingExecution::TrainingExecution(ExperimentType& experiment) :
 	_experiment(experiment), _train_set() {
 
+	// Create the model sub-directory storing trained parameters for the trainable processes
+	mkdir(_experiment.model_path().c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 }
 
 void TrainingExecution::process(size_t refresh_interval) {
@@ -18,6 +20,22 @@ void TrainingExecution::process(size_t refresh_interval) {
 
 		_process_train_data(_experiment.process_at(i), _train_set, refresh_interval);
 		_process_output(i);
+		// Save trained parameters
+		std::string process_save_path = _experiment.model_path() + "/" + _experiment.process_at(i).factory_name() + "." + _experiment.process_at(i).class_name();
+		if (!_experiment.process_at(i).name().empty()) {
+			process_save_path += "." + _experiment.process_at(i).name();
+		}
+		process_save_path += "/";
+		// Create the process sub-directory
+		mkdir(process_save_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+		bool saved = _experiment.process_at(i).save_params(process_save_path);
+		if (saved) {
+			_experiment.log() << "Save trained parameters at " << process_save_path << std::endl;
+		}
+		else {
+			// Remove process sub-directory if no trained parameters saved (process not trainable)
+			rmdir(process_save_path.c_str());
+		}
 	}
 
 	_train_set.clear();

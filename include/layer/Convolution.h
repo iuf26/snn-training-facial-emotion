@@ -4,7 +4,6 @@
 #include "Layer.h"
 #include "Stdp.h"
 #include "dep/npy.hpp"
-
 #include "plot/Threshold.h"
 #include "plot/Evolution.h"
 
@@ -61,13 +60,11 @@ public:
 
 	virtual Shape compute_shape(const Shape& previous_shape);
 
-	void use_trained_model(const std::string& trained_model_path);
-
-	void load_trained_model();
-
 	virtual size_t train_pass_number() const;
 	virtual void process_train_sample(const std::string& label, Tensor<float>& sample, size_t current_pass, size_t current_index, size_t number);
 	virtual void process_test_sample(const std::string& label, Tensor<float>& sample, size_t current_index, size_t number);
+	virtual bool load_params(const std::string& path);
+	virtual bool save_params(const std::string& path);
 
 	virtual void train(const std::string& label, const std::vector<Spike>& input_spike, const Tensor<Time>& input_time, std::vector<Spike>& output_spike);
 	virtual void test(const std::string& label, const std::vector<Spike>& input_spike, const Tensor<Time>& input_time, std::vector<Spike>& output_spike);
@@ -95,9 +92,6 @@ private:
 	bool _wta_infer;
 
 	_priv::ConvolutionImpl _impl;
-
-	bool _load_trained_model;
-	std::string _trained_model_path;
 };
 }
 #endif

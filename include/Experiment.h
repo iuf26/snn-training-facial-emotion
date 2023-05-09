@@ -10,7 +10,6 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
-
 #include "Input.h"
 #include "Process.h"
 #include "Layer.h"
@@ -19,6 +18,8 @@
 #include "InputLayer.h"
 #include "Logger.h"
 #include "Monitor.h"
+#include <sys/stat.h>
+#include <unistd.h>
 
 class AbstractExperiment {
 
@@ -26,8 +27,8 @@ class AbstractExperiment {
 	friend class Layer;
 
 public:
-	AbstractExperiment(const std::string& output_path, const std::string& name, int seed, bool log_to_file);
-	AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, bool log_to_file);
+	AbstractExperiment(const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file);
+	AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file);
 	AbstractExperiment(const AbstractExperiment& that) = delete;
 	virtual ~AbstractExperiment();
 
@@ -121,6 +122,8 @@ public:
 
 	const std::vector<Input*>& train_data() const;
 	const std::vector<Input*>& test_data() const;
+	const std::string& output_path() const;
+	const std::string& model_path() const;
 
 	//const std::vector<Process*>& preprocessing() const;
 
@@ -167,6 +170,7 @@ protected:
 
 	int _seed;
 	std::string _output_path;
+	std::string _model_path;
 	std::string _name;
 	std::default_random_engine _random_generator;
 
@@ -199,14 +203,14 @@ class Experiment : public AbstractExperiment {
 
 public:
 	template<typename... Args>
-	Experiment(int& argc, char** argv, const std::string& output_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
-		AbstractExperiment(argc, argv, output_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
+	Experiment(int& argc, char** argv, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
+		AbstractExperiment(argc, argv, output_path, model_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
 
 	}
 
 	template<typename... Args>
-	Experiment(const std::string& output_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
-		AbstractExperiment(output_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
+	Experiment(const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
+		AbstractExperiment(output_path, model_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
 	}
 
 	virtual void process(size_t refresh_interval) {

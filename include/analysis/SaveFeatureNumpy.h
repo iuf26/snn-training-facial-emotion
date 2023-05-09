@@ -1,5 +1,5 @@
-#ifndef _ANALYSIS_SAVE_OUTPUT_NUMPY_H
-#define _ANALYSIS_SAVE_OUTPUT_NUMPY_H
+#ifndef _ANALYSIS_SAVE_FEATURE_NUMPY_H
+#define _ANALYSIS_SAVE_FEATURE_NUMPY_H
 
 #include <iostream>
 #include "Analysis.h"
@@ -7,13 +7,13 @@
 
 namespace analysis {
 
-	class SaveOutputNumpy : public UniquePassAnalysis {
+	class SaveFeatureNumpy : public UniquePassAnalysis {
 
 	public:
-		SaveOutputNumpy();
-		SaveOutputNumpy(const std::string& path);
-		SaveOutputNumpy(const SaveOutputNumpy& that) = delete;
-		SaveOutputNumpy& operator=(const SaveOutputNumpy& that) = delete;
+		SaveFeatureNumpy();
+		SaveFeatureNumpy(const std::string& path);
+		SaveFeatureNumpy(const SaveFeatureNumpy& that) = delete;
+		SaveFeatureNumpy& operator=(const SaveFeatureNumpy& that) = delete;
 
 		void resize(const Shape&);
 

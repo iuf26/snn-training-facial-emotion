@@ -7,7 +7,7 @@ static RegisterClassParameter<Convolution, LayerFactory> _register("Convolution"
 
 Convolution::Convolution() : Layer3D(_register),
 	_epoch_number(0), _annealing(1.0), _min_th(0),_t_obj(0), _lr_th(0),
-	_w(), _th(), _stdp(nullptr), _input_depth(0), _wta_infer(false), _impl(*this), _load_trained_model(false), _trained_model_path() {
+	_w(), _th(), _stdp(nullptr), _input_depth(0), _wta_infer(false), _impl(*this) {
 
 	add_parameter("epoch", _epoch_number);
 	add_parameter("annealing", _annealing, 1.0f);
@@ -27,7 +27,7 @@ Convolution::Convolution() : Layer3D(_register),
 Convolution::Convolution(size_t filter_width, size_t filter_height, size_t filter_number, size_t stride_x, size_t stride_y, size_t padding_x, size_t padding_y) :
 	Layer3D(_register, filter_width, filter_height, filter_number, stride_x, stride_y, padding_x, padding_y),
 	_annealing(1.0), _min_th(0),_t_obj(0), _lr_th(0),
-	_w(), _th(), _stdp(nullptr), _input_depth(0), _wta_infer(false), _impl(*this), _load_trained_model(false), _trained_model_path() {
+	_w(), _th(), _stdp(nullptr), _input_depth(0), _wta_infer(false), _impl(*this) {
 
 	add_parameter("epoch", _epoch_number);
 	add_parameter("annealing", _annealing, 1.0f);
@@ -60,22 +60,36 @@ Shape Convolution::compute_shape(const Shape& previous_shape) {
 	return Shape({_width, _height, _depth});
 }
 
-void Convolution::use_trained_model(const std::string& trained_model_path) {
-	// Define the path to numpy arrays storing trained parameters
-	// Parameters will be loaded after initializing the layer
-	_trained_model_path = trained_model_path;
-	_load_trained_model = true;
+bool Convolution::save_params(const std::string& path) {
+	std::vector<float> weights;
+	for(size_t i=0; i<_filter_width; i++) {
+		for(size_t j=0; j<_filter_height; j++) {
+			for(size_t k=0; k<_input_depth; k++) {
+				for(size_t l=0; l<_filter_number; l++) {
+					weights.emplace_back(_w.at(i, j, k, l));
+				}
+			}
+		}
+	}
+	std::vector<float> thresholds;
+	for(size_t i=0; i<_filter_number; i++) {
+		thresholds.emplace_back(_th.at(i));
+	}
+	const bool fortran_order{false};
+	const std::vector<long unsigned> shape_weights{_filter_width, _filter_height, _input_depth, _filter_number};
+	npy::SaveArrayAsNumpy(path + "/weights.npy", fortran_order, shape_weights.size(), shape_weights.data(), weights);    
+	const std::vector<long unsigned> shape_thresholds{_filter_number};
+	npy::SaveArrayAsNumpy(path + "/thresholds.npy", fortran_order, shape_thresholds.size(), shape_thresholds.data(), thresholds);
+	return true;
 }
 
-// See analysis::SaveLayer for saving convention
-void Convolution::load_trained_model() {
+bool Convolution::load_params(const std::string& path) {
 	bool fortran_order = false;
-
 	// Weights
 	std::vector<float> weights;
 	std::vector<long unsigned> shape_weights{_filter_width, _filter_height, _input_depth, _filter_number};	
-	npy::LoadArrayFromNumpy(_trained_model_path + "/weights.npy", shape_weights, fortran_order, weights);
-	int index = 0; 
+	npy::LoadArrayFromNumpy(path + "/weights.npy", shape_weights, fortran_order, weights);
+	int index = 0;
 	for(size_t x=0; x<_filter_width; x++) {
 		for(size_t y=0; y<_filter_height; y++) {
 			for(size_t z=0; z<_input_depth; z++) {
@@ -86,14 +100,14 @@ void Convolution::load_trained_model() {
 			}
 		}
 	}
-
-	//Thresholds
+	// Thresholds
 	std::vector<float> thresholds;
 	std::vector<long unsigned> shape_thresholds{_filter_number};	
-	npy::LoadArrayFromNumpy(_trained_model_path + "/thresholds.npy", shape_thresholds, fortran_order, thresholds);
+	npy::LoadArrayFromNumpy(path + "/thresholds.npy", shape_thresholds, fortran_order, thresholds);
 	for(size_t index=0; index<thresholds.size(); index++) {
 		_th.at(index) = thresholds.at(index);
 	}
+	return true;
 }
 
 size_t Convolution::train_pass_number() const {
@@ -178,12 +192,6 @@ void Convolution::train(const std::string&, const std::vector<Spike>& input_spik
 }
 
 void Convolution::test(const std::string&, const std::vector<Spike>& input_spike, const Tensor<Time>& input_time, std::vector<Spike>& output_spike) {
-	// Trained weights and thresholds are loaded if their path is specified
-	// TODO: Find a better time to load them...
-	if (_load_trained_model) {
-		load_trained_model();
-	}
-
 	_impl.test(input_spike, input_time, output_spike);
 }
 
@@ -338,14 +346,17 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 				for(size_t j=0; j<AVX_256_N; j++) {
 					if(_a.at_index(i*AVX_256_N+j) > th.at_index(i*AVX_256_N+j)) {
 						for(size_t z1=0; z1<depth; z1++) {
-							if (_model._t_obj != -1) {
-								th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-							}
+							//if (_model._t_obj != -1) {
+							//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+							//}
 							if(z1 != i*AVX_256_N+j) {
 								th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 							}
 							else {
 								th.at(z1) += _model._lr_th;
+								if (_model._t_obj != -1) {
+									th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+								}
 							}
 							th.at(z1) = std::max<float>(_model._min_th, th.at(z1));
 						}
@@ -525,14 +536,17 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 
 			if(_a.at(0, 0, z) >= th.at(z)) {
 				for(size_t z1=0; z1<depth; z1++) {
-					if (_model._t_obj != -1) {
-						th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-					}
+					//if (_model._t_obj != -1) {
+					//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+					//}
 					if(z1 != z) {
 						th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 					}
 					else {
 						th.at(z1) += _model._lr_th;
+						if (_model._t_obj != -1) {
+							th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+						}
 					}
 					th.at(z1) = std::max<float>(_model._min_th, th.at(z1));
 				}

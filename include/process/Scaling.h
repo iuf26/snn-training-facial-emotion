@@ -3,6 +3,8 @@
 
 #include "Tensor.h"
 #include "Process.h"
+#include "dep/npy.hpp"
+
 
 namespace process {
 
@@ -15,6 +17,8 @@ namespace process {
 		virtual void compute(const std::string& label, const Tensor<float>& sample);
 		virtual void process_train(const std::string& label, Tensor<float>& sample);
 		virtual void process_test(const std::string& label, Tensor<float>& sample);
+		virtual bool save_params(const std::string& path);
+		virtual bool load_params(const std::string& path);
 
 	private:
 		size_t _size;

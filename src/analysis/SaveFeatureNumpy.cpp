@@ -1,32 +1,32 @@
-#include "analysis/SaveOutputNumpy.h"
+#include "analysis/SaveFeatureNumpy.h"
 
 using namespace analysis;
 
-static RegisterClassParameter<SaveOutputNumpy, AnalysisFactory> _register("SaveOutputNumpy");
+static RegisterClassParameter<SaveFeatureNumpy, AnalysisFactory> _register("SaveFeatureNumpy");
 
-SaveOutputNumpy::SaveOutputNumpy() : UniquePassAnalysis(_register),
+SaveFeatureNumpy::SaveFeatureNumpy() : UniquePassAnalysis(_register),
 	_path("./"), _data_train(), _data_test(), _label_train(), _label_test(),
     _train_sample_cnt(0), _test_sample_cnt(0), _width(0), _height(0), _depth(0) {
 	throw std::runtime_error("Unimplemented");
 }
 
-SaveOutputNumpy::SaveOutputNumpy(const std::string& path) : UniquePassAnalysis(_register),
+SaveFeatureNumpy::SaveFeatureNumpy(const std::string& path) : UniquePassAnalysis(_register),
 	_path(path), _data_train(), _data_test(), _label_train(), _label_test(),
     _train_sample_cnt(0), _test_sample_cnt(0), _width(0), _height(0), _depth(0) {
 
 }
 
-void SaveOutputNumpy::resize(const Shape&) {
+void SaveFeatureNumpy::resize(const Shape&) {
  
 }
 
-void SaveOutputNumpy::before_train() {
+void SaveFeatureNumpy::before_train() {
     _data_train.clear();
     _label_train.clear();
     _train_sample_cnt = 0;
 }
 
-void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float>& sample) {
+void SaveFeatureNumpy::process_train(const std::string& label, const Tensor<float>& sample) {
  	_width = sample.shape().dim(0);
 	_height = sample.shape().dim(1);
 	_depth = sample.shape().dim(2);
@@ -42,7 +42,7 @@ void SaveOutputNumpy::process_train(const std::string& label, const Tensor<float
     _train_sample_cnt += 1;
 }
 
-void SaveOutputNumpy::after_train() {
+void SaveFeatureNumpy::after_train() {
     const bool fortran_order{false};
     
     const std::vector<long unsigned> shape_data{_train_sample_cnt, _width, _height, _depth};
@@ -52,13 +52,13 @@ void SaveOutputNumpy::after_train() {
     npy::SaveArrayAsNumpy(_path + '/' + "y_train.npy", fortran_order, shape_label.size(), shape_label.data(), _label_train);
 }
 
-void SaveOutputNumpy::before_test() {
+void SaveFeatureNumpy::before_test() {
     _data_test.clear();
     _label_test.clear();
     _test_sample_cnt = 0;
 }
 
-void SaveOutputNumpy::process_test(const std::string& label, const Tensor<float>& sample) {
+void SaveFeatureNumpy::process_test(const std::string& label, const Tensor<float>& sample) {
  	_width = sample.shape().dim(0);
 	_height = sample.shape().dim(1);
 	_depth = sample.shape().dim(2);
@@ -74,7 +74,7 @@ void SaveOutputNumpy::process_test(const std::string& label, const Tensor<float>
     _test_sample_cnt += 1;
 }
 
-void SaveOutputNumpy::after_test() {
+void SaveFeatureNumpy::after_test() {
     const bool fortran_order{false};
     
     const std::vector<long unsigned> shape_data{_test_sample_cnt, _width, _height, _depth};

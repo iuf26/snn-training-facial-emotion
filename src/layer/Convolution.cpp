@@ -346,17 +346,17 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 				for(size_t j=0; j<AVX_256_N; j++) {
 					if(_a.at_index(i*AVX_256_N+j) > th.at_index(i*AVX_256_N+j)) {
 						for(size_t z1=0; z1<depth; z1++) {
-							//if (_model._t_obj != -1) {
-							//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-							//}
+							if (_model._t_obj != -1) {
+								th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+							}
 							if(z1 != i*AVX_256_N+j) {
 								th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 							}
 							else {
 								th.at(z1) += _model._lr_th;
-								if (_model._t_obj != -1) {
-									th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-								}
+								//if (_model._t_obj != -1) {
+								//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+								//}
 							}
 							th.at(z1) = std::max<float>(_model._min_th, th.at(z1));
 						}
@@ -394,6 +394,9 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 						}
 						else {
 							th.at(z1) += _model._lr_th;
+							//if (_model._t_obj != -1) {
+							//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+							//}
 						}
 						th.at(z1) = std::max<float>(_model._min_th, th.at(z1));
 					}
@@ -536,17 +539,17 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 
 			if(_a.at(0, 0, z) >= th.at(z)) {
 				for(size_t z1=0; z1<depth; z1++) {
-					//if (_model._t_obj != -1) {
-					//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-					//}
+					if (_model._t_obj != -1) {
+						th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+					}
 					if(z1 != z) {
 						th.at(z1) -= _model._lr_th/static_cast<float>(depth-1);
 					}
 					else {
 						th.at(z1) += _model._lr_th;
-						if (_model._t_obj != -1) {
-							th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
-						}
+						//if (_model._t_obj != -1) {
+						//	th.at(z1) -= _model._lr_th*(spike.time-_model._t_obj);
+						//}
 					}
 					th.at(z1) = std::max<float>(_model._min_th, th.at(z1));
 				}

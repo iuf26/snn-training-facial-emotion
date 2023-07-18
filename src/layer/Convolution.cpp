@@ -584,7 +584,7 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 	for(const Spike& spike : input_spike) {
 
 		// Get the spatial position of output neurons integrating inputs coming from the spatial position of the input spike
-		// NOTE : output_spikes should be called output_pos_to_process
+		// NOTE: output_spikes should be called pos_to_process or something like that
 		std::vector<std::tuple<uint16_t, uint16_t, uint16_t, uint16_t>> output_spikes;
 		_model.forward(spike.x, spike.y, output_spikes);
 
@@ -608,10 +608,9 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 					continue;
 				}
 
-				//NOTE: Error in the AVX256 function
 				// WTA test should be here too, to prevent two neurons from different feature maps
 				// but sharing the same spatial position to fire at the same time
-				// Hard to do with parallel operations... 
+				// BUT not in the AVX implementation because hard to do with multiprocessing 
 				//if(_model._wta_infer && _wta.at(x, y)) {
 				//	continue;
 				//}

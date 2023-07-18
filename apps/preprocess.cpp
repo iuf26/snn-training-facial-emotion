@@ -20,7 +20,7 @@
 #include "dep/ArduinoJson-v6.17.3.h"
 
 
-// NOTE: TEMPORARY... Find a better solution (works on Linux only)
+// NOTE: Works on Linux only
 std::string get_build_path() {
 	// Get the absolute path to the executable
 	char self[4096] = { 0 };
@@ -35,7 +35,6 @@ std::string get_build_path() {
 }
 
 
-// NOTE: TEMPORARY... Find a better solution 
 void load_dataset(AbstractExperiment* experiment, std::string& data_path, std::string& label_path, std::string& dataset) {
     int width = 0;
 	int height = 0;

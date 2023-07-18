@@ -37,6 +37,8 @@ include_directories(include/ ${LAPACK_INCLUDES})
 set(APPS_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -ansi -pedantic -Wshadow -Weffc++ -ftemplate-backtrace-limit=0  -msse -msse2 -msse3 -march=native -mfpmath=sse")
 add_definitions(-DSMID_AVX256)
 
+add_compile_options(-std=c++14)
+
 add_subdirectory(dep/libsvm)
 
 if(USE_GUI)
@@ -54,9 +56,12 @@ target_link_libraries(${LIBRARY_NAME} ${BLAS_LIBRARIES} ${LAPACK_lapack_LIBRARY}
 if(USE_GUI)
     target_link_libraries(${LIBRARY_NAME} Qt4::QtCore Qt4::QtGui qcustomplot)
 endif()
+
+
 #
 #   Build executables
 #
+
 file(GLOB_RECURSE apps apps/*)
 foreach(app ${apps})
     get_filename_component(app_name ${app} NAME_WE)
@@ -67,5 +72,3 @@ foreach(app ${apps})
 	target_link_libraries(${app_name} Qt4::QtCore Qt4::QtGui)
     endif()
 endforeach()
-
-

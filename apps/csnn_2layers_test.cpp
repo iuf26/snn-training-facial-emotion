@@ -180,15 +180,70 @@ int main(int argc, char** argv) {
 	auto& pool1 = experiment->push<layer::Pooling>(config["pool1_size"], config["pool1_size"], config["pool1_size"], config["pool1_size"]);
 	pool1.set_name("pool1");
 
+	// Convolutional layer
+	int conv2_k_w;
+	int conv2_k_h;
+	if (config.containsKey("conv2_k"))
+	{
+		conv2_k_w = config["conv2_k"];
+		conv2_k_h = config["conv2_k"];
+	}
+	else
+	{
+		conv2_k_w = config["conv2_k_w"];
+		conv2_k_h = config["conv2_k_h"];
+	}
+	auto &conv2 = experiment->push<layer::Convolution>(conv2_k_w, conv2_k_h, config["conv2_c"]);
+	conv2.set_name("conv2");
+	conv2.parameter<uint32_t>("epoch").set(0);
+	conv2.parameter<float>("annealing").set(config["conv2_annealing"]);
+	conv2.parameter<float>("min_th").set(config["conv2_min_th"]);
+	conv2.parameter<float>("t_obj").set(config["conv2_t_obj"]);
+	conv2.parameter<float>("lr_th").set(config["conv2_lr_th"]);
+	conv2.parameter<bool>("wta_infer").set(config["conv2_wta_infer"]);
+	conv2.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(config["conv2_w_init_mean"], config["conv2_w_init_std"]);
+	conv2.parameter<Tensor<float>>("th").distribution<distribution::Constant>(config["conv2_th"].as<float>());
+	std::string stdp_type2(config["conv2_stdp"].as<const char *>());
+	if (config["conv2_stdp_lr"].is<JsonArray>())
+	{
+		ap = config["conv2_stdp_lr"][0];
+		am = config["conv2_stdp_lr"][1];
+	}
+	else
+	{
+		ap = config["conv2_stdp_lr"];
+		am = config["conv2_stdp_lr"];
+	}
+	if (stdp_type2 == "multiplicative")
+	{
+		conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(ap, am, config["conv2_stdp_b"]);
+	}
+	else if (stdp_type2 == "biological")
+	{
+		conv2.parameter<STDP>("stdp").set<stdp::Biological>(ap, am, config["conv2_stdp_t"]);
+	}
+	else
+	{
+		throw std::runtime_error("STDP type " + stdp_type2 + " is not implemented");
+	}
+
+	// Pooling layer
+	auto &pool2 = experiment->push<layer::Pooling>(config["pool2_size"], config["pool2_size"], config["pool2_size"], config["pool2_size"]);
+	pool2.set_name("pool2");
+
 	// Activity analysis
-	auto& conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);
+	auto &conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_activity.add_analysis<analysis::Coherence>();
-	auto& pool1_activity = experiment->output<DefaultOutput>(pool1, 0.0, 1.0);
+	auto &pool1_activity = experiment->output<DefaultOutput>(pool1, 0.0, 1.0);
 	pool1_activity.add_analysis<analysis::Activity>();
-	
+	auto &conv2_activity = experiment->output<DefaultOutput>(conv2, 0.0, 1.0);
+	conv2_activity.add_analysis<analysis::Coherence>();
+	auto &pool2_activity = experiment->output<DefaultOutput>(pool2, 0.0, 1.0);
+	pool2_activity.add_analysis<analysis::Activity>();
+
 	// Save feature maps
-	auto& pool1_save = experiment->output<SpikeTiming>(pool1);
-	pool1_save.add_analysis<analysis::SaveFeatureNumpy>(output_path);
+	auto &pool2_save = experiment->output<SpikeTiming>(pool2);
+	pool2_save.add_analysis<analysis::SaveFeatureNumpy>(output_path);
 
 	experiment->run(10000);
 	delete experiment;

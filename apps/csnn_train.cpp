@@ -155,9 +155,9 @@ int main(int argc, char **argv)
 		{
 			experiment->push<process::GrayScale>();
 		}
-		if (!config["dog"].isNull())
+		if (config.containsKey("dog") && config["dog"] == true)
 		{
-			experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
+			experiment->push<process::DefaultOnOffFilter>(7, 1, 2);
 		}
 	}
 	if (config["feature_scaling"] == true)

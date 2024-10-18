@@ -1,3 +1,4 @@
 .vscode/
 apps/TimeStream.cpp
 src/process/skeletonPose
+build/

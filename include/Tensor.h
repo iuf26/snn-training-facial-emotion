@@ -33,6 +33,7 @@ public:
 		for (size_t i = 0; i < _dims.size(); i++)
 		{
 			_product.push_back(std::accumulate(std::begin(_dims) + i, std::end(_dims), 1, std::multiplies<size_t>()));
+
 		}
 		_product.push_back(1);
 	}
@@ -49,22 +50,12 @@ public:
 	{
 	}
 
-	Shape &operator=(const Shape &that) noexcept
-	{
+	Shape& operator=(const Shape& that) noexcept {
 		_dims = that._dims;
 		_product = that._product;
 		return *this;
 	}
 
-	Shape &operator=(Shape &&that) noexcept
-	{
-		if (that._dims.size())
-		{
-			_dims = std::move(that._dims);
-			_product = std::move(that._product);
-		}
-		return *this;
-	}
 	/**
 	 * @brief return the number of dimentions
 	 *
@@ -98,98 +89,85 @@ public:
 		return _to_index<0, Index...>(std::forward<Index>(index)...);
 	}
 
-	bool operator==(const Shape &that) const
-	{
+	bool operator==(const Shape& that) const {
 		return _dims == that._dims;
 	}
 
-	bool operator!=(const Shape &that) const
-	{
+	bool operator!=(const Shape& that) const {
 		return _dims != that._dims;
 	}
 
-	void print(std::ostream &stream) const
-	{
+	void print(std::ostream& stream) const {
 		stream << "[";
 
-		for (size_t i = 0; i < _dims.size(); i++)
-		{
-			if (i != 0)
+		for(size_t i=0; i<_dims.size(); i++) {
+			if(i != 0)
 				stream << ", ";
 			stream << _dims[i];
 		}
 		stream << "]";
 	}
 
-	std::string to_string() const
-	{
+	std::string to_string() const {
 		std::stringstream ss;
 		print(ss);
 		return ss.str();
 	}
 
 private:
-	template <size_t Index, typename Head, typename... Tail>
-	size_t _to_index(Head head, Tail &&...tail) const
-	{
+	template<size_t Index, typename Head, typename... Tail>
+	size_t _to_index(Head head, Tail&&... tail) const {
 		ASSERT_DEBUG(static_cast<int64_t>(head) >= 0 && static_cast<int64_t>(head) < static_cast<int64_t>(_dims.at(Index)));
-		return _product[Index + 1] * head + _to_index<Index + 1, Tail...>(std::forward<Tail>(tail)...);
+		return _product[Index+1]*head+_to_index<Index+1, Tail...>(std::forward<Tail>(tail)...);
 	}
 
-	template <size_t Index>
-	size_t _to_index() const
-	{
+	template<size_t Index>
+	size_t _to_index() const {
 		return 0;
 	}
 
 	std::vector<size_t> _dims;
 	std::vector<size_t> _product;
+
 };
 
-template <typename T>
-class Tensor
-{
+template<typename T>
+class Tensor {
 
 public:
-	typedef T Type;
+    typedef T Type;
 
-	Tensor() : _shape(), _data(nullptr)
-	{
+	Tensor() : _shape(), _data(nullptr) {
+
 	}
 
-	Tensor(const Shape &shape) : _shape(shape), _data(new T[_shape.product()])
-	{
+	Tensor(const Shape& shape) : _shape(shape), _data(new T[_shape.product()]) {
+
 	}
 
-	Tensor(const Tensor &that) noexcept : _shape(that._shape), _data(new T[_shape.product()])
-	{
-		std::copy(that._data, that._data + _shape.product(), _data);
+	Tensor(const Tensor& that) noexcept : _shape(that._shape), _data(new T[_shape.product()]) {
+		std::copy(that._data, that._data+_shape.product(), _data);
 	}
 
-	Tensor(Tensor &&that) noexcept : _shape(std::move(that._shape)), _data(that._data)
-	{
+	Tensor(Tensor&& that) noexcept : _shape(std::move(that._shape)), _data(that._data) {
 		that._data = nullptr;
 	}
 
-	~Tensor()
-	{
+	~Tensor() {
 		delete[] _data;
 	}
 
-	Tensor &operator=(const Tensor &that) noexcept
-	{
-		if (_shape.product() != that.shape().product())
-		{
+	Tensor& operator=(const Tensor& that) noexcept {
+		if(_shape.product() != that.shape().product()) {
 			delete[] _data;
 			_data = new T[that._shape.product()];
 		}
 		_shape = that._shape;
-		std::copy(that._data, that._data + _shape.product(), _data);
+		std::copy(that._data, that._data+_shape.product(), _data);
 		return *this;
 	}
 
-	Tensor &operator=(Tensor &&that) noexcept
-	{
+	Tensor& operator=(Tensor&& that) noexcept {
 		delete[] _data;
 		_shape = std::move(that._shape);
 		_data = that._data;
@@ -197,63 +175,52 @@ public:
 		return *this;
 	}
 
-	template <typename... Index>
-	T &at(Index &&...index)
-	{
+	template<typename... Index>
+	T& at(Index&&... index) {
 		return _data[_shape.to_index(std::forward<Index>(index)...)];
 	}
 
-	template <typename... Index>
-	T at(Index &&...index) const
-	{
+	template<typename... Index>
+	T at(Index&&... index) const {
 		return _data[_shape.to_index(std::forward<Index>(index)...)];
 	}
 
-	template <typename... Index>
-	T *ptr(Index &&...index)
-	{
-		return _data + _shape.to_index(std::forward<Index>(index)...);
+	template<typename... Index>
+	T* ptr(Index&&... index) {
+		return _data+_shape.to_index(std::forward<Index>(index)...);
 	}
 
-	template <typename... Index>
-	const T *ptr(Index &&...index) const
-	{
-		return _data + _shape.to_index(std::forward<Index>(index)...);
+	template<typename... Index>
+	const T* ptr(Index&&... index) const {
+		return _data+_shape.to_index(std::forward<Index>(index)...);
 	}
 
-	T &at_index(size_t index)
-	{
+	T& at_index(size_t index) {
 		ASSERT_DEBUG(index < _shape.product());
 		return _data[index];
 	}
 
-	T at_index(size_t index) const
-	{
+	T at_index(size_t index) const {
 		ASSERT_DEBUG(index < _shape.product());
 		return _data[index];
 	}
 
-	T *ptr_index(size_t index)
-	{
+	T* ptr_index(size_t index) {
 		ASSERT_DEBUG(index < _shape.product());
-		return _data + index;
+		return _data+index;
 	}
 
-	const T *ptr_index(size_t index) const
-	{
+	const T* ptr_index(size_t index) const {
 		ASSERT_DEBUG(index < _shape.product());
-		return _data + index;
+		return _data+index;
 	}
 
-	const Shape &shape() const
-	{
+	const Shape& shape() const {
 		return _shape;
 	}
 
-	void reshape(const Shape &shape)
-	{
-		if (shape.product() != _shape.product())
-		{
+	void reshape(const Shape& shape) {
+		if(shape.product() != _shape.product()) {
 			throw std::runtime_error("reshape: Shape must be of same length");
 		}
 		_shape = shape;
@@ -302,32 +269,26 @@ public:
 		T cmax = *it.second;
 		size_t size = _shape.product();
 
-		if (cmin == cmax)
-		{
-			for (size_t i = 0; i < size; i++)
-			{
+		if(cmin == cmax) {
+			for(size_t i=0; i<size; i++) {
 				_data[i] = min;
 			}
 		}
-		else
-		{
-			for (size_t i = 0; i < size; i++)
-			{
-				_data[i] = ((_data[i] - cmin) / (cmax - cmin)) * (max - min) + min;
+		else {
+			for(size_t i=0; i<size; i++) {
+				_data[i] = ((_data[i]-cmin)/(cmax-cmin))*(max-min)+min;
 			}
 		}
+
 	}
 
-	std::pair<T, T> min_max_exclude(T v = std::numeric_limits<T>::max()) const
-	{
+	std::pair<T, T> min_max_exclude(T v = std::numeric_limits<T>::max()) const {
 		size_t size = _shape.product();
 		T min = std::numeric_limits<T>::max();
 		T max = std::numeric_limits<T>::lowest();
 
-		for (size_t i = 0; i < size; i++)
-		{
-			if (_data[i] != v)
-			{
+		for(size_t i=0; i<size; i++) {
+			if(_data[i] != v) {
 				min = std::min(min, _data[i]);
 				max = std::max(max, _data[i]);
 			}
@@ -1897,8 +1858,7 @@ public:
 
 		Shape new_shape(dims);
 
-		if (new_shape.product() != _shape.product())
-		{
+		if(new_shape.product() != _shape.product()) {
 			delete[] _data;
 			_data = new T[new_shape.product()];
 		}
@@ -1908,33 +1868,30 @@ public:
 		size_t size = _shape.product();
 
 		uint8_t flag = 0;
-		stream.read(reinterpret_cast<char *>(&flag), sizeof(uint8_t));
+		stream.read(reinterpret_cast<char*>(&flag), sizeof(uint8_t));
 
-		if (flag == 0)
-		{ // sparse
+		if(flag == 0) { //sparse
 			uint32_t index;
-			stream.read(reinterpret_cast<char *>(&index), sizeof(uint32_t));
+			stream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 			float value;
-			while (index != 0xFFFFFFFF)
-			{
-				stream.read(reinterpret_cast<char *>(&value), sizeof(float));
+			while(index != 0xFFFFFFFF) {
+				stream.read(reinterpret_cast<char*>(&value), sizeof(float));
 				at_index(index) = value;
-				stream.read(reinterpret_cast<char *>(&index), sizeof(uint32_t));
+				stream.read(reinterpret_cast<char*>(&index), sizeof(uint32_t));
 			}
 		}
-		else if (flag == 1)
-		{
-			stream.read(reinterpret_cast<char *>(begin()), sizeof(float) * size);
+		else if(flag == 1){
+			stream.read(reinterpret_cast<char*>(begin()), sizeof(float)*size);
 		}
-		else
-		{
+		else {
 			throw std::runtime_error("Tensor load: unkown flag");
 		}
 	}
 
 private:
 	Shape _shape;
-	T *_data;
+	T* _data;
+
 };
 
 #endif

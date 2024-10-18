@@ -6,13 +6,14 @@
 #include <filesystem>
 #include "tool/Operations.h"
 
-namespace analysis {
 	/**
  	* @brief SVM (support vector machine), this CSNN simulator uses STDP unsupervised learning, 
 	* so a classification layer is needed to evaluate the accuracy of the network.
 	* Any other supervised learning method can be used, but the SVM was chosen for it's simplicity and efficacity.
     * @param draw A flag that draws the features that will be classified by the SVM, the information is recorded in the folder in the build file.
  	*/
+
+namespace analysis {
 	class Svm : public TwoPassAnalysis {
 
 	public:

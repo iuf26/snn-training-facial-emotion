@@ -2,46 +2,41 @@
 
 using namespace dataset;
 
-Mnist::Mnist(const std::string &image_filename, const std::string &label_filename, size_t max_read) : _image_filename(image_filename), _label_filename(label_filename),
-																									  _image_file(image_filename, std::ios::binary), _label_file(label_filename, std::ios::binary),
-																									  _size(0), _cursor(0), _shape({MNIST_HEIGHT, MNIST_WIDTH, MNIST_DEPTH}), _max_read(max_read)
-{
+Mnist::Mnist(const std::string &image_filename, const std::string &label_filename, size_t max_read) :
+	_image_filename(image_filename), _label_filename(label_filename),
+	_image_file(image_filename, std::ios::binary), _label_file(label_filename, std::ios::binary),
+	_size(0), _cursor(0), _shape({MNIST_WIDTH, MNIST_HEIGHT, MNIST_DEPTH}), _max_read(max_read) {
 
-	if (!_image_file.is_open())
-	{
-		throw std::runtime_error("Can't open " + image_filename);
+	if(!_image_file.is_open()) {
+		throw std::runtime_error("Can't open "+image_filename);
 	}
-	if (!_label_file.is_open())
-	{
-		throw std::runtime_error("Can't open " + label_filename);
+	if(!_label_file.is_open()) {
+		throw std::runtime_error("Can't open "+label_filename);
 	}
 
 	read_header();
 }
 
-bool Mnist::has_next() const
-{
+bool Mnist::has_next() const {
 	return _cursor < size();
 }
 
-std::pair<std::string, Tensor<InputType>> Mnist::next()
-{
+
+std::pair<std::string, Tensor<InputType>> Mnist::next() {
 	assert(!_label_file.eof());
 	assert(!_image_file.eof());
 
+
 	uint8_t label;
-	_label_file.read((char *)&label, sizeof(uint8_t));
+	_label_file.read((char*)&label, sizeof(uint8_t));
 
 	std::pair<std::string, Tensor<InputType>> out(std::to_string(static_cast<size_t>(label)), _shape);
 
-	for (size_t y = 0; y < MNIST_HEIGHT; y++)
-	{
-		for (size_t x = 0; x < MNIST_WIDTH; x++)
-		{
+	for(size_t y = 0; y < MNIST_WIDTH; y++) {
+		for(size_t x = 0; x < MNIST_HEIGHT; x++) {
 			uint8_t pixel;
-			_image_file.read((char *)&pixel, sizeof(uint8_t));
-			// each pixel value is devided by the max value, (ex. value/255)
-			out.second.at(y, x, 0) = static_cast<InputType>(pixel) / static_cast<InputType>(std::numeric_limits<uint8_t>::max());
+			_image_file.read((char*)&pixel, sizeof(uint8_t));
+			out.second.at(x, y, 0) = static_cast<InputType>(pixel)/static_cast<InputType>(std::numeric_limits<uint8_t>::max());
 		}
 	}
 
@@ -52,16 +47,14 @@ std::pair<std::string, Tensor<InputType>> Mnist::next()
 	return out;
 }
 
-void Mnist::reset()
-{
+void Mnist::reset() {
 	_cursor = 0;
 	_label_file.seekg(0, std::ios::beg);
 	_image_file.seekg(0, std::ios::beg);
 	read_header();
 }
 
-void Mnist::close()
-{
+void Mnist::close() {
 	_label_file.close();
 	_image_file.close();
 }
@@ -111,7 +104,6 @@ void Mnist::read_header()
 	assert(label_size == _size);
 }
 
-uint32_t Mnist::swap(uint32_t v)
-{
+uint32_t Mnist::swap(uint32_t v) {
 	return ((v & 0xFF) << 24) | ((v & 0xFF00) << 8) | ((v & 0xFF0000) >> 8) | ((v & 0xFF000000) >> 24);
 }

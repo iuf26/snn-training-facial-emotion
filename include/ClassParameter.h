@@ -311,7 +311,7 @@ protected:
 	}
 
 private:
-	void _set(Distribution<T>* d) {
+	void _set(distribution::Distribution<T>* d) {
 		if(_initialized) {
 			throw std::runtime_error("Variable already initialized");
 		}
@@ -321,7 +321,7 @@ private:
 	}
 
 	T& _ref;
-	Distribution<T>* _distribution;
+	distribution::Distribution<T>* _distribution;
 };
 
 template<typename T>
@@ -483,7 +483,7 @@ protected:
 	}
 
 private:
-	void _set(Distribution<T>* d) {
+	void _set(distribution::Distribution<T>* d) {
 		if(_initialized) {
 			throw std::runtime_error("Variable already initialized");
 		}
@@ -509,7 +509,7 @@ private:
 
 private:
 	Tensor<T>& _ref;
-	Distribution<T>* _distribution;
+	distribution::Distribution<T>* _distribution;
 	Tensor<T>* _value;
 	Shape _shape;
 };

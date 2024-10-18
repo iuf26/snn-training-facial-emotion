@@ -120,12 +120,12 @@ void DenseIntermediateExecution::_process_output(size_t index) {
 
 				size_t n = analysis->train_pass_number();
 
-				for(size_t i=0; i<n; i++) {
-					analysis->before_train_pass(i);
+				for(size_t j=0; j<n; j++) {
+					analysis->before_train_pass(j);
 					for(std::pair<std::string, Tensor<float>>& entry : output_train_set) {
-						analysis->process_train_sample(entry.first, entry.second, i);
+						analysis->process_train_sample(entry.first, entry.second, j);
 					}
-					analysis->after_train_pass(i);
+					analysis->after_train_pass(j);
 				}
 
 				if(n == 0) {

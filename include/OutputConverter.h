@@ -99,4 +99,11 @@ public:
 	virtual Tensor<float> process(const Tensor<float>& in);
 };
 
+class SpikeTiming : public OutputConverter {
+
+public:
+	SpikeTiming();
+
+	virtual Tensor<float> process(const Tensor<float>& in);
+};
 #endif

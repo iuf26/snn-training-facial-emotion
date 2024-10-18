@@ -109,12 +109,12 @@ namespace process
 		BiologicalOnOffFilter();
 		BiologicalOnOffFilter(size_t filter_size, float center_dev, float surround_dev);
 
-		virtual Shape compute_shape(const Shape &shape);
-		virtual void process_train(const std::string &label, Tensor<float> &sample);
-		virtual void process_test(const std::string &label, Tensor<float> &sample);
+		virtual Shape compute_shape(const Shape& shape);
+		virtual void process_train(const std::string& label, Tensor<float>& sample);
+		virtual void process_test(const std::string& label, Tensor<float>& sample);
 
 	private:
-		void _process(Tensor<float> &in) const;
+		void _process(Tensor<float>& in) const;
 
 		size_t _filter_size;
 		float _center_dev;

@@ -60,6 +60,7 @@ namespace layer
 			std::string _label; // the label of the cuttent sample
 			Tensor<float> _a;
 			Tensor<bool> _inh;
+			Tensor<bool> _wta;
 		};
 #endif
 	}
@@ -103,6 +104,8 @@ namespace layer
 		void plot_threshold(bool only_in_train);
 		void plot_evolution(bool only_in_train);
 
+		virtual bool load_params(const std::string& filename);
+		virtual bool save_params(const std::string& filename);
 	private:
 		uint32_t _epoch_number;
 

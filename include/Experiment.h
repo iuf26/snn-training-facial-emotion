@@ -10,7 +10,6 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
-
 #include "InputTool.h"
 #include "Input.h"
 #include "Process.h"
@@ -21,8 +20,10 @@
 #include "Logger.h"
 #include "Monitor.h"
 
-class AbstractExperiment
-{
+#include <sys/stat.h>
+#include <unistd.h>
+
+class AbstractExperiment {
 
 	friend class InputLayer;
 	friend class Layer;
@@ -44,24 +45,24 @@ public:
 		_tool.push_back(new T(std::forward<Args>(args)...));
 	}
 
-	template <typename T, typename... Args>
-	void add_train(Args &&...args)
-	{
+	AbstractExperiment(const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file);
+	AbstractExperiment(int& argc, char** argv, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file);
+
+	template<typename T, typename... Args>
+	void add_train(Args&&... args) {
 		_train_data.push_back(new T(std::forward<Args>(args)...));
 		_check_data_shape(_train_data.back()->shape());
 	}
 
-	template <typename T, typename... Args>
-	void add_test(Args &&...args)
-	{
+	template<typename T, typename... Args>
+	void add_test(Args&&... args) {
 		_test_data.push_back(new T(std::forward<Args>(args)...));
 		_check_data_shape(_test_data.back()->shape());
 	}
 
-	template <typename T, typename... Args>
-	T &push(Args &&...args)
-	{
-		T *process = new T(std::forward<Args>(args)...);
+	template<typename T, typename... Args>
+	T& push(Args&&... args) {
+		T* process = new T(std::forward<Args>(args)...);
 		process->_set_info(_process_list.size(), this);
 		_process_list.push_back(process);
 		return *process;
@@ -122,16 +123,20 @@ public:
 	OutputStream &print() const;
 
 	std::default_random_engine &random_generator();
-	/*
-	InputLayer& input_layer();
-	const InputLayer& input_layer() const;
-*/
 	const Shape &input_shape() const;
 
 	Time time_limit() const;
 
-	const std::vector<Input *> &train_data() const;
-	const std::vector<Input *> &test_data() const;
+
+/*
+	InputLayer& input_layer();
+	const InputLayer& input_layer() const;
+*/
+
+	const std::vector<Input*>& train_data() const;
+	const std::vector<Input*>& test_data() const;
+	const std::string& output_path() const;
+	const std::string& model_path() const;
 
 	//const std::vector<Process*>& preprocessing() const;
 
@@ -140,7 +145,7 @@ public:
 	size_t process_number() const;
 	AbstractProcess &process_at(size_t index);
 	const AbstractProcess &process_at(size_t index) const;
-	/*
+	
 	Layer& layer_at(size_t i);
 	const Layer& layer_at(size_t i) const;
 
@@ -148,9 +153,8 @@ public:
 	const Layer& layer(const std::string& name) const;
 
 	size_t layer_count() const;
-*/
-	Output &output_at(size_t i);
-	const Output &output_at(size_t i) const;
+	Output& output_at(size_t i);
+	const Output& output_at(size_t i) const;
 	size_t output_count() const;
 
 	virtual Tensor<Time> compute_time_at(size_t i) const = 0;
@@ -176,35 +180,32 @@ protected:
 	OutputStream &_log;
 	OutputStream &_print;
 
+	int _seed;
+	std::string _output_path;
+	std::string _model_path;
 	std::string _name;
 	std::default_random_engine _random_generator;
 
 	//std::vector<Process*> _preprocessing;
 
-	Shape *_input_shape;
+	std::vector<InputTool *> _tool;
+
+	Shape* _input_shape;
 
 	Time _time_limit;
 
-	std::vector<InputTool *> _tool;
-
-	std::vector<Input *> _train_data;
-	std::vector<Input *> _test_data;
-
-	//InputLayer* _input_layer;
-	//std::vector<Layer*> _layer;
-
-	//std::vector<std::pair<size_t, size_t>> _train_step;
-	std::vector<AbstractProcess *> _process_list;
+	std::vector<Input*> _train_data;
+	std::vector<Input*> _test_data;
+	std::vector<AbstractProcess*> _process_list;
 
 #ifdef ENABLE_QT
-	std::vector<std::pair<Plot *, int>> _plots;
+	std::vector<std::pair<Plot*, int>> _plots;
 #endif
 
-	std::vector<Monitor *> _monitors;
+	std::vector<Monitor*> _monitors;
 
-	std::vector<Output *> _outputs;
+	std::vector<Output*> _outputs;
 };
-
 /**
  * @brief 
  * 
@@ -212,28 +213,23 @@ protected:
  * @param argc int - is an integer that indicates the number of strings contained in the array
  * @param name string - is the name of the experiment (this is used in the logs and in the build folder, the visualisation folders for each experiment are named with this name)
  */
-template <typename ExecutionPolicy>
-class Experiment : public AbstractExperiment
-{
+
+template<typename ExecutionPolicy>
+class Experiment : public AbstractExperiment {
 
 public:
-	template <typename... Args>
-	Experiment(int &argc, char **argv, const std::string &name, Args &&...args) : AbstractExperiment(argc, argv, name), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set()
-	{
+	template<typename... Args>
+	Experiment(int& argc, char** argv, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
+		AbstractExperiment(argc, argv, output_path, model_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
+
 	}
 
-	template <typename... Args>
-	Experiment(const std::string &name, Args &&...args) : AbstractExperiment(name), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set()
-	{
-	}
-
-	virtual void process(size_t refresh_interval)
-	{
+	virtual void process(size_t refresh_interval) {
 		_execution.process(refresh_interval);
 	}
 
-	virtual Tensor<Time> compute_time_at(size_t i) const
-	{
+
+	virtual Tensor<Time> compute_time_at(size_t i) const {
 		return _execution.compute_time_at(i);
 	}
 

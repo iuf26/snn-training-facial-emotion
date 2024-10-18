@@ -18,8 +18,7 @@ BiologicalMultiplicative::BiologicalMultiplicative(float alpha, float beta, Time
 }
 
 float BiologicalMultiplicative::process(float w, const Time pre, Time post) {
-	float v = pre <= post ? w+_alpha*std::exp(-(post-pre)/_tau)*std::exp(-_beta*w)  
-	:  w-_alpha*std::exp(-(pre-post)/_tau)*std::exp(_beta*(w-1.0f));
+	float v = pre <= post ? w+_alpha*std::exp(-(post-pre)/_tau)*std::exp(-_beta*w)  :  w-_alpha*std::exp(-(pre-post)/_tau)*std::exp(_beta*(w-1.0f));
 	return std::max<float>(0, std::min<float>(1, v));
 }
 

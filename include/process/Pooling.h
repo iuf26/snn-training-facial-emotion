@@ -52,12 +52,12 @@ namespace process
 		SumPooling();
 		SumPooling(size_t target_width, size_t target_height);
 
-		virtual Shape compute_shape(const Shape &shape);
-		virtual void process_train(const std::string &label, Tensor<float> &sample);
-		virtual void process_test(const std::string &label, Tensor<float> &sample);
+		virtual Shape compute_shape(const Shape& shape);
+		virtual void process_train(const std::string& label, Tensor<float>& sample);
+		virtual void process_test(const std::string& label, Tensor<float>& sample);
 
 	private:
-		void _process(Tensor<float> &sample) const;
+		void _process(Tensor<float>& sample) const;
 
 		size_t _target_width;
 		size_t _target_height;
@@ -118,11 +118,31 @@ namespace process
 		void _process(Tensor<float> &sample) const;
 
 		size_t _target_conv_depth;
-
 		size_t _width;
 		size_t _height;
 		size_t _depth;
 		size_t _conv_depth;
+	};
+
+	class MeanPooling : public UniquePassProcess {
+
+	public:
+		MeanPooling();
+		MeanPooling(size_t target_width, size_t target_height);
+
+		virtual Shape compute_shape(const Shape& shape);
+		virtual void process_train(const std::string& label, Tensor<float>& sample);
+		virtual void process_test(const std::string& label, Tensor<float>& sample);
+
+	private:
+		void _process(Tensor<float>& sample) const;
+
+		size_t _target_width;
+		size_t _target_height;
+
+		size_t _width;
+		size_t _height;
+		size_t _depth;
 	};
 }
 

@@ -32,25 +32,20 @@ Svm::Svm(const size_t &draw) : TwoPassAnalysis(_register),
 	_problem.y = nullptr;
 }
 
-void Svm::resize(const Shape &shape)
-{
+void Svm::resize(const Shape& shape) {
 	_node_count = 0;
 	_sample_count = 0;
 	_size = shape.product();
 	_label_index.clear();
 }
 
-void Svm::compute(const std::string &label, const Tensor<float> &sample)
-{
-	if (_label_index.find(label) == std::end(_label_index))
-	{
+void Svm::compute(const std::string& label, const Tensor<float>& sample) {
+	if(_label_index.find(label) == std::end(_label_index)) {
 		_label_index.emplace(label, _label_index.size());
 	}
 
-	for (size_t j = 0; j < _size; j++)
-	{
-		if (sample.at_index(j) != 0.0)
-		{
+	for(size_t j=0; j<_size; j++) {
+		if(sample.at_index(j) != 0.0) {
 			_node_count++;
 		}
 	}
@@ -72,34 +67,33 @@ void Svm::compute(const std::string &label, const Tensor<float> &sample)
 	}
 }
 
-void Svm::before_train()
-{
+void Svm::before_train() {
 	_train_nodes = new struct svm_node[_node_count];
 	_test_nodes = new struct svm_node[_size];
 
 	_problem.l = _sample_count;
 	_problem.y = new double[_sample_count];
-	_problem.x = new struct svm_node *[_sample_count];
+	_problem.x = new struct svm_node*[_sample_count];
 
 	_sample_count = 0;
 	_node_count = 0;
+
 }
 
-void Svm::process_train(const std::string &label, const Tensor<float> &sample)
-{
+void Svm::process_train(const std::string& label, const Tensor<float>& sample) {
 	_problem.y[_sample_count] = _label_index[label];
-	_problem.x[_sample_count] = _train_nodes + _node_count;
+	_problem.x[_sample_count] = _train_nodes+_node_count;
 
-	for (size_t j = 0; j < _size; j++)
-	{
+	for(size_t j=0; j<_size; j++) {
 		float v = sample.at_index(j);
 
-		if (v != 0.0)
-		{
-			_train_nodes[_node_count].index = j + 1;
+		if(v != 0.0) {
+			_train_nodes[_node_count].index = j+1;
 			_train_nodes[_node_count].value = v;
 			_node_count++;
 		}
+
+
 	}
 	_train_nodes[_node_count].index = -1;
 	_node_count++;
@@ -107,14 +101,13 @@ void Svm::process_train(const std::string &label, const Tensor<float> &sample)
 	_sample_count++;
 }
 
-void Svm::after_train()
-{
+void Svm::after_train() {
 	struct svm_parameter parameters;
 
 	parameters.svm_type = C_SVC;
 	parameters.kernel_type = LINEAR;
 	parameters.degree = 3;
-	parameters.gamma = 1.0 / static_cast<float>(_size);
+	parameters.gamma = 1.0/static_cast<float>(_size);
 	parameters.coef0 = 0;
 	parameters.nu = 0.5;
 	parameters.cache_size = 100;
@@ -131,22 +124,19 @@ void Svm::after_train()
 	_model = ::svm_train(&_problem, &parameters);
 }
 
-void Svm::before_test()
-{
+void Svm::before_test() {
 	_correct_sample = 0;
 	_total_sample = 0;
+
 }
 
-void Svm::process_test(const std::string &label, const Tensor<float> &sample)
-{
+void Svm::process_test(const std::string& label, const Tensor<float>& sample) {
 	size_t node_cursor = 0;
-	for (size_t j = 0; j < _size; j++)
-	{
+	for(size_t j=0; j<_size; j++) {
 		float v = sample.at_index(j);
 
-		if (v != 0.0)
-		{
-			_test_nodes[node_cursor].index = j + 1;
+		if(v != 0.0) {
+			_test_nodes[node_cursor].index = j+1;
 			_test_nodes[node_cursor].value = v;
 			node_cursor++;
 		}
@@ -157,21 +147,17 @@ void Svm::process_test(const std::string &label, const Tensor<float> &sample)
 
 	auto it = _label_index.find(label);
 
-	if (it != std::end(_label_index) && y_pred == it->second)
-	{
+	if(it != std::end(_label_index) && y_pred == it->second) {
 		_correct_sample++;
 	}
-	
-
-	//experiment().log() << "Predecred / Correct" << " (" << (y_pred) << "/" << it->second << ")" << std::endl;
-
 	_total_sample++;
 }
 
-void Svm::after_test()
-{
+void Svm::after_test() {
 	experiment().log() << "===SVM===" << std::endl;
-	experiment().log() << "classification rate: " << (static_cast<float>(_correct_sample) / static_cast<float>(_total_sample) * 100.0) << "% (" << _correct_sample << "/" << _total_sample << ")" << std::endl;
+	experiment().log() << "classification rate: " <<
+						 (static_cast<float>(_correct_sample)/static_cast<float>(_total_sample)*100.0) << "% (" <<
+						 _correct_sample << "/" << _total_sample << ")" << std::endl;
 	experiment().log() << std::endl;
 
 	delete[] _problem.y;

@@ -29,6 +29,8 @@ public:
 	virtual size_t train_pass_number() const = 0;
 	virtual void process_train_sample(const std::string& label, Tensor<float>& sample, size_t current_pass, size_t current_index, size_t number) = 0;
 	virtual void process_test_sample(const std::string& label, Tensor<float>& sample, size_t current_index, size_t number) = 0;
+	virtual bool load_params(const std::string&) { return false; } // To load trained parameters of the process (if it has any)
+	virtual bool save_params(const std::string&) { return false; } // To save trained parameters of the process (if it has any)
 
 	const Shape& shape() const;
 	const Shape& resize(const Shape& shape);

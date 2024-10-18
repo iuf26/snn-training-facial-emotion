@@ -4,7 +4,6 @@
 #include "Stdp.h"
 
 namespace stdp {
-	
 	class Linear : public STDP {
 
 	public:

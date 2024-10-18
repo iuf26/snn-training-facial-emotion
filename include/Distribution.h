@@ -3,24 +3,26 @@
 
 #include <random>
 
-template<typename T>
-class Distribution {
-
-public:
-	virtual ~Distribution() {
-
-	}
-
-	virtual T generate(std::default_random_engine& random_generator) const = 0;
-	virtual std::string to_string() const = 0;
-};
-
 /**
  * @brief The distribution type, that can be Constant, Uniform or Gaussian.
  * All tenors are initially random values.
  * 
  */
 namespace distribution {
+
+	template<typename T>
+	class Distribution {
+
+	public:
+		virtual ~Distribution() {
+	
+		}
+
+		virtual T generate(std::default_random_engine& random_generator) const = 0;
+		virtual std::string to_string() const = 0;
+	};
+
+	
 
 	template<typename T>
 	class Constant : public Distribution<T> {

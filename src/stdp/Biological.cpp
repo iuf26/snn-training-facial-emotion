@@ -4,22 +4,31 @@ using namespace stdp;
 
 static RegisterClassParameter<Biological, STDPFactory> _register("Biological");
 
-Biological::Biological() : STDP(_register), _alpha(0), _tau(0) {
-	add_parameter("alpha", _alpha);
+Biological::Biological() : STDP(_register), _ap(0), _am(0), _tau(0) {
+	add_parameter("ap", _ap);
+	add_parameter("am", _am);
 	add_parameter("tau", _tau);
 }
 
+Biological::Biological(float alpha, Time tau) : STDP(_register), _ap(alpha), _am(alpha), _tau(tau) {
+	add_parameter("ap", alpha);
+	add_parameter("am", alpha);
+	add_parameter("tau", tau);
+}
 
-Biological::Biological(float alpha, float tau) : Biological() {
-	parameter<float>("alpha").set(alpha);
+
+Biological::Biological(float ap, float am, Time tau) : Biological() {
+	parameter<float>("ap").set(ap);
+	parameter<float>("am").set(am);
 	parameter<float>("tau").set(tau);
 }
 
 float Biological::process(float w, const Time pre, Time post) {
-	float v = pre <= post ? w+_alpha*std::exp(-(post-pre)/_tau) :  w-_alpha*std::exp(-(pre-post)/_tau);
+	float v = pre <= post ? w+_ap*std::exp(-(post-pre)/_tau) :  w-_am*std::exp(-(pre-post)/_tau);
 	return std::max<float>(0, std::min<float>(1, v));
 }
 
 void Biological::adapt_parameters(float factor) {
-	_alpha *= factor;
+	_ap *= factor;
+	_am *= factor;
 }

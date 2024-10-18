@@ -46,12 +46,10 @@ Tensor<float> process::_priv::OnOffFilterHelper::generate_filter(size_t filter_s
 	}
 
 	Tensor<float> filter(Shape({filter_size, filter_size}));
-	for (size_t i = 0; i < filter_size; i++)
-	{
-		for (size_t j = 0; j < filter_size; j++)
-		{
+	for(size_t i=0; i<filter_size; i++) {
+		for(size_t j=0; j<filter_size; j++) {
 			// The final filter is the difference between the two DoG filters.
-			filter.at(i, j) = filter1.at(i, j) / filter_sum1 - filter2.at(i, j) / filter_sum2;
+			filter.at(i, j) = filter1.at(i, j)/filter_sum1-filter2.at(i, j)/filter_sum2;
 		}
 	}
 
@@ -183,7 +181,6 @@ void DefaultOnOffFilter::_process(const std::string &label, Tensor<InputType> &i
 	}
 
 		//	Tensor<float>::display_range_tensor(in);
-
 }
 
 //
@@ -193,15 +190,13 @@ void DefaultOnOffFilter::_process(const std::string &label, Tensor<InputType> &i
 static RegisterClassParameter<CustomRGBOnOffFilter, ProcessFactory> _register_2("CustomRGBOnOffFilter");
 
 CustomRGBOnOffFilter::CustomRGBOnOffFilter() : UniquePassProcess(_register_2),
-											   _r(), _g(), _b(), _height(0), _width(0), _depth(0), _conv_depth(0)
-{
+	_r(), _g(), _b(), _width(0), _height(0) {
 	add_parameter("r", _r);
 	add_parameter("g", _g);
 	add_parameter("b", _b);
 }
 
-CustomRGBOnOffFilter::CustomRGBOnOffFilter(const std::string &filename) : CustomRGBOnOffFilter()
-{
+CustomRGBOnOffFilter::CustomRGBOnOffFilter(const std::string& filename): CustomRGBOnOffFilter() {
 	NumpyArchive filters;
 	NumpyReader::load(filename, filters);
 
@@ -328,7 +323,6 @@ void CustomRGBOnOffFilter::_process(Tensor<InputType> &in) const
 				out.at(x, y, 5, k) = std::max<float>(0, -v);
 			}
 		}
-
 	in = out;
 }
 
@@ -339,105 +333,91 @@ void CustomRGBOnOffFilter::_process(Tensor<InputType> &in) const
 static RegisterClassParameter<BiologicalOnOffFilter, ProcessFactory> _register_3("BiologicalOnOffFilter");
 
 BiologicalOnOffFilter::BiologicalOnOffFilter() : UniquePassProcess(_register_3),
-												 _filter_size(0), _center_dev(0), _surround_dev(0), _height(0), _width(0), _depth(0), _filter()
-{
+	_filter_size(0), _center_dev(0), _surround_dev(0), _width(0), _height(0), _depth(0), _filter() {
 	add_parameter("filter_size", _filter_size);
 	add_parameter("center_dev", _center_dev);
 	add_parameter("surround_dev", _surround_dev);
 }
 
-BiologicalOnOffFilter::BiologicalOnOffFilter(size_t filter_size, float center_dev, float surround_dev) : BiologicalOnOffFilter()
-{
+BiologicalOnOffFilter::BiologicalOnOffFilter(size_t filter_size, float center_dev, float surround_dev) : BiologicalOnOffFilter() {
 	parameter<size_t>("filter_size").set(filter_size);
 	parameter<float>("center_dev").set(center_dev);
 	parameter<float>("surround_dev").set(surround_dev);
 }
 
-Shape BiologicalOnOffFilter::compute_shape(const Shape &shape)
-{
-	_height = shape.dim(0);
-	_width = shape.dim(1);
+Shape  BiologicalOnOffFilter::compute_shape(const Shape& shape) {
+	_width = shape.dim(0);
+	_height = shape.dim(1);
 	_depth = shape.dim(2);
-	_conv_depth = shape.number() > 3 ? shape.dim(3) : 1;
 
-	if (_depth != 3)
-	{
+	if(_depth != 3) {
 		throw std::runtime_error("Incompatible depth (require 3 channels)");
 	}
 
 	_filter = _priv::OnOffFilterHelper::generate_filter(_filter_size, _center_dev, _surround_dev);
-	return Shape({_height, _width, _depth * 2, _conv_depth});
+	return Shape({_width, _height, _depth*2});
 }
 
-void BiologicalOnOffFilter::process_train(const std::string &, Tensor<float> &sample)
-{
+void BiologicalOnOffFilter::process_train(const std::string&, Tensor<float>& sample) {
 	_process(sample);
 }
 
-void BiologicalOnOffFilter::process_test(const std::string &, Tensor<float> &sample)
-{
+void BiologicalOnOffFilter::process_test(const std::string&, Tensor<float>& sample) {
 	_process(sample);
 }
 
-void BiologicalOnOffFilter::_process(Tensor<InputType> &in) const
-{
-	Tensor<InputType> out(Shape({_height, _width, _depth * 2, _conv_depth}));
+void BiologicalOnOffFilter::_process(Tensor<InputType>& in) const {
+	Tensor<InputType> out(Shape({_width, _height, _depth*2}));
 
-	for (size_t k = 0; k < _conv_depth; k++)
-		for (size_t x = 0; x < _height; x++)
-		{
-			for (size_t y = 0; y < _width; y++)
-			{
+	for(size_t x=0; x<_width; x++) {
+		for(size_t y=0; y<_height; y++) {
 
-				// Black / White
-				float v1 = 0;
-				for (size_t fx = 0; fx < _filter_size; fx++)
-				{
-					for (size_t fy = 0; fy < _filter_size; fy++)
-					{
-						size_t x_in = x + fx > _filter_size / 2 ? std::min(x + fx - _filter_size / 2, _height - 1) : 0;
-						size_t y_in = y + fy > _filter_size / 2 ? std::min(y + fy - _filter_size / 2, _width - 1) : 0;
+			// Black / White
+			float v1 = 0;
+			for(size_t fx=0; fx<_filter_size; fx++) {
+				for(size_t fy=0; fy<_filter_size; fy++) {
+					size_t x_in = x+fx > _filter_size/2 ? std::min(x+fx-_filter_size/2, _width-1) : 0;
+					size_t y_in = y+fy > _filter_size/2 ? std::min(y+fy-_filter_size/2, _height-1) : 0;
 
-						v1 += (0.2126 * in.at(x_in, y_in, 0, k) + 0.7152 * in.at(x_in, y_in, 1, k) + 0.0722 * in.at(x_in, y_in, 2, k)) * _filter.at(fx, fy);
-					}
+					v1 += (0.2126*in.at(x_in, y_in, 0)+0.7152*in.at(x_in, y_in, 1)+0.0722*in.at(x_in, y_in, 2))*_filter.at(fx, fy);
 				}
-
-				out.at(x, y, 0, k) = std::max<float>(0, v1);
-				out.at(x, y, 1, k) = std::max<float>(0, -v1);
-
-				// Red / Green
-				float v2 = 0;
-				for (size_t fx = 0; fx < _filter_size; fx++)
-				{
-					for (size_t fy = 0; fy < _filter_size; fy++)
-					{
-						size_t x_in = x + fx > _filter_size / 2 ? std::min(x + fx - _filter_size / 2, _height - 1) : 0;
-						size_t y_in = y + fy > _filter_size / 2 ? std::min(y + fy - _filter_size / 2, _width - 1) : 0;
-
-						v2 += (0.5 + 0.5 * in.at(x_in, y_in, 0, k) - 0.5 * in.at(x_in, y_in, 1, k)) * _filter.at(fx, fy);
-					}
-				}
-
-				out.at(x, y, 2, k) = std::max<float>(0, v2);
-				out.at(x, y, 3, k) = std::max<float>(0, -v2);
-
-				// Yellow / Blue
-				float v3 = 0;
-				for (size_t fx = 0; fx < _filter_size; fx++)
-				{
-					for (size_t fy = 0; fy < _filter_size; fy++)
-					{
-						size_t x_in = x + fx > _filter_size / 2 ? std::min(x + fx - _filter_size / 2, _height - 1) : 0;
-						size_t y_in = y + fy > _filter_size / 2 ? std::min(y + fy - _filter_size / 2, _width - 1) : 0;
-
-						v3 += (0.5 + 0.25 * in.at(x_in, y_in, 0, k) + 0.25 * in.at(x_in, y_in, 1, k) - 0.5 * in.at(x_in, y_in, 2, k)) * _filter.at(fx, fy);
-					}
-				}
-
-				out.at(x, y, 4, k) = std::max<float>(0, v3);
-				out.at(x, y, 5, k) = std::max<float>(0, -v3);
 			}
+
+			out.at(x, y, 0) = std::max<float>(0, v1);
+			out.at(x, y, 1) = std::max<float>(0, -v1);
+
+			// Red / Green
+			float v2 = 0;
+			for(size_t fx=0; fx<_filter_size; fx++) {
+				for(size_t fy=0; fy<_filter_size; fy++) {
+					size_t x_in = x+fx > _filter_size/2 ? std::min(x+fx-_filter_size/2, _width-1) : 0;
+					size_t y_in = y+fy > _filter_size/2 ? std::min(y+fy-_filter_size/2, _height-1) : 0;
+
+					v2 += (0.5+0.5*in.at(x_in, y_in, 0)-0.5*in.at(x_in, y_in, 1))*_filter.at(fx, fy);
+				}
+			}
+
+			out.at(x, y, 2) = std::max<float>(0, v2);
+			out.at(x, y, 3) = std::max<float>(0, -v2);
+
+
+			// Yellow / Blue
+			float v3 = 0;
+			for(size_t fx=0; fx<_filter_size; fx++) {
+				for(size_t fy=0; fy<_filter_size; fy++) {
+					size_t x_in = x+fx > _filter_size/2 ? std::min(x+fx-_filter_size/2, _width-1) : 0;
+					size_t y_in = y+fy > _filter_size/2 ? std::min(y+fy-_filter_size/2, _height-1) : 0;
+
+					v3 += (0.5+0.25*in.at(x_in, y_in, 0)+0.25*in.at(x_in, y_in, 1)-0.5*in.at(x_in, y_in, 2))*_filter.at(fx, fy);
+				}
+			}
+
+			out.at(x, y, 4) = std::max<float>(0, v3);
+			out.at(x, y, 5) = std::max<float>(0, -v3);
+
+
 		}
+	}
 
 	in = out;
 }

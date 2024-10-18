@@ -11,7 +11,6 @@ typedef float Time;
 struct Spike {
 
 	Spike(Time p_time, uint16_t p_x, uint16_t p_y, uint16_t p_z, uint16_t p_k = 1) : x(p_x), y(p_y), z(p_z), k(p_k), time(p_time)  {
-
 	}
 
 

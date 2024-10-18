@@ -18,7 +18,7 @@ void Layer::set_size(size_t width, size_t height)
 
 	_current_width = width;
 	_current_height = height;
-	_current_conv_depth = _conv_depth;
+	_current_conv_depth = 1;
 }
 
 void Layer::set_size(size_t width, size_t height, size_t conv_depth)
@@ -63,25 +63,20 @@ bool Layer::require_sorted() const
 }
 
 #ifdef ENABLE_QT
-void Layer::plot_time(bool only_in_train, size_t n, float min, float max)
-{
-	add_plot<plot::TimeHistogram>(only_in_train, experiment(), index() + 1, n, min, max);
+void Layer::plot_time(bool only_in_train, size_t n, float min, float max) {
+	add_plot<plot::TimeHistogram>(only_in_train, experiment(), index()+1, n, min, max);
 }
 
-void Layer::_add_plot(Plot *plot, bool only_in_train)
-{
+void Layer::_add_plot(Plot* plot, bool only_in_train) {
 	experiment()->add_plot(plot, only_in_train ? index() : -1);
 }
 #endif
 
-std::vector<const Layer *> Layer::_previous_layer_list() const
-{
-	std::vector<const Layer *> layers;
-	for (int i = index(); i >= 0; i--)
-	{
-		if (dynamic_cast<const Layer *>(&experiment()->process_at(i)))
-		{
-			layers.push_back(dynamic_cast<const Layer *>(&experiment()->process_at(i)));
+std::vector<const Layer*> Layer::_previous_layer_list() const {
+	std::vector<const Layer*> layers;
+	for(int i=index(); i>=0; i--) {
+		if(dynamic_cast<const Layer*>(&experiment()->process_at(i))) {
+			layers.push_back(dynamic_cast<const Layer*>(&experiment()->process_at(i)));
 		}
 	}
 	return layers;
@@ -91,11 +86,10 @@ std::vector<const Layer *> Layer::_previous_layer_list() const
 //	Layer3D
 //
 
-Shape Layer3D::compute_shape(const Shape &previous_shape)
-{
-	parameter<size_t>("filter_number").ensure_initialized(experiment()->random_generator());
+Shape Layer3D::compute_shape(const Shape& previous_shape) {
 	parameter<size_t>("filter_width").ensure_initialized(experiment()->random_generator());
 	parameter<size_t>("filter_height").ensure_initialized(experiment()->random_generator());
+	parameter<size_t>("filter_number").ensure_initialized(experiment()->random_generator());
 	parameter<size_t>("stride_x").ensure_initialized(experiment()->random_generator());
 	parameter<size_t>("stride_y").ensure_initialized(experiment()->random_generator());
 	parameter<size_t>("padding_x").ensure_initialized(experiment()->random_generator());
@@ -104,13 +98,12 @@ Shape Layer3D::compute_shape(const Shape &previous_shape)
 	size_t previous_width = previous_shape.dim(0);
 	size_t previous_height = previous_shape.dim(1);
 
-	if (previous_width + 2 * _padding_x < _filter_width || previous_height + 2 * _padding_y < _filter_height)
-	{
+	if(previous_width+2*_padding_x < _filter_width || previous_height+2*_padding_y<_filter_height) {
 		throw std::runtime_error("Filter dimension need to be smaller than the input");
 	}
 
-	_width = (previous_width + 2 * _padding_x - _filter_width) / _stride_x + 1;
-	_height = (previous_height + 2 * _padding_y - _filter_height) / _stride_y + 1;
+	_width = (previous_width+2*_padding_x-_filter_width)/_stride_x+1;
+	_height = (previous_height+2*_padding_y-_filter_height)/_stride_y+1;
 	_depth = _filter_number;
 
 	return Shape({_width, _height, _depth});
@@ -124,6 +117,8 @@ Shape Layer3D::compute_shape(const Shape &previous_shape)
  * @param y_in the y coordinate of the spike
  * @param output 
  */
+// Search for output neurons integrating input of position (x_in, y_in)
+// For each involved output neuron, we get the position of the input in its window (i.e. the weight modulating the input)
 void Layer3D::forward(uint16_t x_in, uint16_t y_in, std::vector<std::tuple<uint16_t, uint16_t, uint16_t, uint16_t>> &output)
 {
 	// The new coordinates of the spike during the convolution process.

@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 	conv1.parameter<bool>("draw").set(false);
 	conv1.parameter<bool>("save_weights").set(true);
 	conv1.parameter<bool>("inhibition").set(true);
-	conv1.parameter<uint32_t>("epoch").set(100);
+	conv1.parameter<uint32_t>("epoch").set(5);
 	conv1.parameter<float>("annealing").set(0.95f);
 	conv1.parameter<float>("min_th").set(1.0f);
 	conv1.parameter<float>("t_obj").set(t_obj);
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 	conv1_out.add_analysis<analysis::Activity>();
 	conv1_out.add_analysis<analysis::Coherence>();
 	//conv1_out.add_analysis<analysis::Svm>();
-
+	
 	experiment.push<process::UniformReorder>(0.1f, 0.9f);
 	
 	auto &conv2 = experiment.push<layer::Convolution>(ks, ks, fn);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 	conv2.parameter<bool>("draw").set(false);
 	conv2.parameter<bool>("save_weights").set(true);
 	conv2.parameter<bool>("inhibition").set(true);
-	conv2.parameter<uint32_t>("epoch").set(100);
+	conv2.parameter<uint32_t>("epoch").set(5);
 	conv2.parameter<float>("annealing").set(0.95f);
 	conv2.parameter<float>("min_th").set(1.0f);
 	conv2.parameter<float>("t_obj").set(t_obj);
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
 	conv2_out.add_analysis<analysis::Coherence>();
 	conv2_out.add_analysis<analysis::Svm>();
 
-	experiment.run(10000);
+	experiment.run(100);
 
 	return experiment.wait();
 }

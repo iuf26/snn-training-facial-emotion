@@ -73,7 +73,6 @@ void SpikeConverter::to_spike(const Tensor<Time> &in, std::vector<Spike> &out, s
 							out.emplace_back(t, x - x_start, y - y_start, z, k);
 						}
 					}
-
 	std::sort(std::begin(out), std::end(out), TimeComparator());
 }
 

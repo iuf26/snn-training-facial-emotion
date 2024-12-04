@@ -35,6 +35,20 @@ TimeObjectiveOutput::TimeObjectiveOutput(Time t_obj) : TimeObjectiveOutput() {
     parameter<float>("t_obj").set(t_obj);
 }
 
+TimeObjectiveOutput::TimeObjectiveOutput(Time t_obj, std::string exp_name, std::string layer_name, size_t save_timestamps) : TimeObjectiveOutput()
+{
+	parameter<float>("t_obj").set(t_obj);
+	_save_timestamps = save_timestamps;
+	if (save_timestamps == 1)
+	{
+		_exp_name = exp_name;
+		_layer_name = layer_name;
+		std::filesystem::create_directories("SaveFeatures/" + _exp_name + "/");
+		_file_path = std::filesystem::current_path();
+	}
+}
+
+
 Tensor<float> TimeObjectiveOutput::process(const Tensor<Time>& in) {
 	Tensor<float> out(in.shape());
 

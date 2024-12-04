@@ -1,5 +1,6 @@
 #include "Experiment.h"
 #include "dataset/ImageBin.h"
+#include "dataset/Spikes.h"
 #include "stdp/Multiplicative.h"
 #include "stdp/Biological.h"
 #include "layer/Convolution.h"
@@ -18,6 +19,7 @@
 #include "process/WhitenPatchesLoader.h"
 #include "process/SeparateSign.h"
 #include "dep/ArduinoJson-v6.17.3.h"
+#include <stdio.h>
 
 // NOTE: Works on Linux only
 std::string get_build_path()
@@ -35,12 +37,12 @@ std::string get_build_path()
 	return path;
 }
 
-
 void load_dataset(AbstractExperiment *experiment, std::string &data_path, std::string &label_path, std::string &dataset)
 {
 	int width = 0;
 	int height = 0;
 	int depth = 0;
+	bool spike = 0;
 	if (dataset == "MNIST")
 	{
 		width = 28;
@@ -59,23 +61,31 @@ void load_dataset(AbstractExperiment *experiment, std::string &data_path, std::s
 		height = 96;
 		depth = 3;
 	}
-	else if (dataset == "STL10-64")
-	{
-		width = 64;
-		height = 64;
-		depth = 3;
-	}
 	else if (dataset == "ETH80")
 	{
 		width = 100;
 		height = 100;
 		depth = 3;
 	}
+	else if (dataset == "SPIKES_MNIST")
+	{
+		width = 12;
+		height = 12;
+		depth = 64;
+		spike = 1;
+	}
 	else
 	{
 		throw std::runtime_error("Dataset loader for " + dataset + " is not implemented");
 	}
-	experiment->add_train<dataset::ImageBin>(data_path, label_path, width, height, depth, dataset);
+	if (spike == 0)
+	{
+		experiment->add_train<dataset::ImageBin>(data_path, label_path, width, height, depth, dataset);
+	}
+	else
+	{
+		experiment->add_train<dataset::Spikes>(data_path, label_path, width, height, depth, dataset);
+	}
 }
 
 int main(int argc, char **argv)
@@ -125,11 +135,11 @@ int main(int argc, char **argv)
 	std::string model_path = output_path + "/model/";
 	if (config["use_sparse"] == true)
 	{
-		experiment = new Experiment<TrainingSparseExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingSparseExecution>(argv, argc, output_path, model_path, exp_name, seed, true);
 	}
 	else
 	{
-		experiment = new Experiment<TrainingExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingExecution>(argv, argc, output_path, model_path, exp_name, seed, true);
 	}
 
 	// Save config path to the model directory
@@ -146,7 +156,7 @@ int main(int argc, char **argv)
 	// Preprocessing
 	if (config.containsKey("whiten") && config["whiten"] == true)
 	{
-		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/whiten-filters/" + dataset_name);
+		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/../whiten-filters/" + dataset_name);
 		experiment->push<process::SeparateSign>();
 	}
 	else
@@ -164,7 +174,10 @@ int main(int argc, char **argv)
 	{
 		experiment->push<process::FeatureScaling>();
 	}
-	experiment->push<LatencyCoding>();
+	if (config["latency_coding"] == true)
+	{
+		experiment->push<LatencyCoding>();
+	}
 
 	// Convolutional layer
 	int conv1_k_w;
@@ -187,6 +200,9 @@ int main(int argc, char **argv)
 	conv1.parameter<float>("t_obj").set(config["conv1_t_obj"]);
 	conv1.parameter<float>("lr_th").set(config["conv1_lr_th"]);
 	conv1.parameter<bool>("wta_infer").set(config["conv1_wta_infer"]);
+	conv1.parameter<bool>("inhibition").set(config["inhibition"]);
+	conv1.parameter<bool>("save_weights").set(config["save_weights"]);
+	conv1.parameter<bool>("draw").set(config["draw"]);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(config["conv1_w_init_mean"], config["conv1_w_init_std"]);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(config["conv1_th"].as<float>());
 	std::string stdp_type(config["conv1_stdp"].as<const char *>());
@@ -219,70 +235,16 @@ int main(int argc, char **argv)
 	auto &pool1 = experiment->push<layer::Pooling>(config["pool1_size"], config["pool1_size"], config["pool1_size"], config["pool1_size"]);
 	pool1.set_name("pool1");
 
-	// Convolutional layer
-	int conv2_k_w;
-	int conv2_k_h;
-	if (config.containsKey("conv2_k"))
-	{
-		conv2_k_w = config["conv2_k"];
-		conv2_k_h = config["conv2_k"];
-	}
-	else
-	{
-		conv2_k_w = config["conv2_k_w"];
-		conv2_k_h = config["conv2_k_h"];
-	}
-	auto &conv2 = experiment->push<layer::Convolution>(conv2_k_w, conv2_k_h, config["conv2_c"]);
-	conv2.set_name("conv2");
-	conv2.parameter<uint32_t>("epoch").set(config["conv2_epochs"]);
-	conv2.parameter<float>("annealing").set(config["conv2_annealing"]);
-	conv2.parameter<float>("min_th").set(config["conv2_min_th"]);
-	conv2.parameter<float>("t_obj").set(config["conv2_t_obj"]);
-	conv2.parameter<float>("lr_th").set(config["conv2_lr_th"]);
-	conv2.parameter<bool>("wta_infer").set(config["conv2_wta_infer"]);
-	conv2.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(config["conv2_w_init_mean"], config["conv2_w_init_std"]);
-	conv2.parameter<Tensor<float>>("th").distribution<distribution::Constant>(config["conv2_th"].as<float>());
-	std::string stdp_type2(config["conv2_stdp"].as<const char *>());
-	if (config["conv2_stdp_lr"].is<JsonArray>())
-	{
-		ap = config["conv2_stdp_lr"][0];
-		am = config["conv2_stdp_lr"][1];
-	}
-	else
-	{
-		ap = config["conv2_stdp_lr"];
-		am = config["conv2_stdp_lr"];
-	}
-	if (stdp_type2 == "multiplicative")
-	{
-		conv2.parameter<STDP>("stdp").set<stdp::Multiplicative>(ap, am, config["conv2_stdp_b"]);
-	}
-	else if (stdp_type2 == "biological")
-	{
-		conv2.parameter<STDP>("stdp").set<stdp::Biological>(ap, am, config["conv2_stdp_t"]);
-	}
-	else
-	{
-		throw std::runtime_error("STDP type " + stdp_type2 + " is not implemented");
-	}
-
-	// Pooling layer
-	auto &pool2 = experiment->push<layer::Pooling>(config["pool2_size"], config["pool2_size"], config["pool2_size"], config["pool2_size"]);
-	pool2.set_name("pool2");
-
 	// Activity analysis
 	auto &conv1_activity = experiment->output<DefaultOutput>(conv1, 0.0, 1.0);
 	conv1_activity.add_analysis<analysis::Coherence>();
+
 	auto &pool1_activity = experiment->output<DefaultOutput>(pool1, 0.0, 1.0);
 	pool1_activity.add_analysis<analysis::Activity>();
-	auto &conv2_activity = experiment->output<DefaultOutput>(conv2, 0.0, 1.0);
-	conv2_activity.add_analysis<analysis::Coherence>();
-	auto &pool2_activity = experiment->output<DefaultOutput>(pool2, 0.0, 1.0);
-	pool2_activity.add_analysis<analysis::Activity>();
 
 	// Save feature maps
-	auto &pool2_save = experiment->output<SpikeTiming>(pool2);
-	pool2_save.add_analysis<analysis::SaveFeatureNumpy>(output_path);
+	auto &pool1_save = experiment->output<SpikeTiming>(pool1);
+	pool1_save.add_analysis<analysis::SaveFeatureNumpy>(output_path);
 
 	experiment->run(10000);
 	delete experiment;

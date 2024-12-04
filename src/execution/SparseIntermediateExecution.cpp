@@ -23,7 +23,9 @@ void SparseIntermediateExecution::process(size_t refresh_interval) {
 		_experiment.print() << std::endl;
 
 		_process_train_data(_experiment.process_at(i), _train_set, refresh_interval);
+		
 		_process_test_data(_experiment.process_at(i), _test_set);
+		
 		_process_output(i);
 
 		auto end = std::chrono::system_clock::now();

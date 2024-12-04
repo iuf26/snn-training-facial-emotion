@@ -224,6 +224,7 @@ void TemporalPooling::_process(Tensor<float> &in) const
 	in = out;
 }
 
+
 static RegisterClassParameter<MeanPooling, ProcessFactory> _register_1("MeanPooling");
 
 
@@ -281,5 +282,79 @@ void MeanPooling::_process(Tensor<float>& in) const {
 		}
 	}
 
+	in = out;
+}
+
+static RegisterClassParameter<MaxPooling, ProcessFactory> _registerMax("MaxPooling");
+
+MaxPooling::MaxPooling() : UniquePassProcess(_registerMax),
+						   _target_width(0), _target_height(0), _target_conv_depth(0), _width(0), _height(0), _depth(0), _conv_depth(0)
+{
+	add_parameter("width", _target_width);
+	add_parameter("height", _target_height);
+	add_parameter("conv_depth", _target_conv_depth);
+}
+
+MaxPooling::MaxPooling(size_t target_width, size_t target_height, size_t target_conv_depth) : MaxPooling()
+{
+	parameter<size_t>("width").set(target_width);
+	parameter<size_t>("height").set(target_height);
+	parameter<size_t>("conv_depth").set(target_conv_depth);
+}
+
+Shape MaxPooling::compute_shape(const Shape &shape)
+{
+	_width = shape.dim(0);
+	_height = shape.dim(1);
+	_depth = shape.dim(2);
+	_conv_depth = shape.number() > 3 ? shape.dim(3) : 1;
+	// In case the user didn't want temporal pooling, the _target_conv_depth would be the same as the _conv_depth
+	_target_conv_depth = _target_conv_depth == 0 ? _conv_depth : _target_conv_depth;
+
+	return Shape({std::min<size_t>(_target_width, _width),
+				  std::min<size_t>(_target_height, _height),
+				  _depth, std::min<size_t>(_target_conv_depth, _conv_depth)});
+}
+
+void MaxPooling::process_train(const std::string &, Tensor<float> &sample)
+{
+	_process(sample);
+}
+
+void MaxPooling::process_test(const std::string &, Tensor<float> &sample)
+{
+	_process(sample);
+}
+
+void MaxPooling::_process(Tensor<float> &in) const
+{
+
+	size_t output_width = std::min<size_t>(_target_width, _width);
+	size_t output_height = std::min<size_t>(_target_height, _height);
+	size_t output_conv_depth = std::min<size_t>(_target_conv_depth, _conv_depth);
+
+	size_t filter_width = _width / output_width;
+	size_t filter_height = _height / output_height;
+	size_t filter_conv_depth = _conv_depth / output_conv_depth;
+
+	Tensor<float> out(Shape({output_width, output_height, _depth, output_conv_depth}));
+
+	for (size_t x = 0; x < output_width; x++)
+		for (size_t y = 0; y < output_height; y++)
+			for (size_t z = 0; z < _depth; z++)
+				for (size_t k = 0; k < output_conv_depth; k++)
+				{
+					// the value for pôoling
+					float v = 0;
+
+					for (size_t fx = 0; fx < filter_width; fx++)
+						for (size_t fy = 0; fy < filter_height; fy++)
+							for (size_t fk = 0; fk < filter_conv_depth; fk++)
+							{
+								v = std::max<float>(v, in.at(x * filter_width + fx, y * filter_height + fy, z, k * filter_conv_depth + fk));
+							}
+
+					out.at(x, y, z, k) = v;
+				}
 	in = out;
 }

@@ -64,8 +64,11 @@ void TrainingExecution::_process_train_data(AbstractProcess& process, std::vecto
 		throw std::runtime_error("train_pass_number() should be > 0");
 	}
 
+	refresh_interval=10;
 	for(size_t i=0; i<n; i++) {
 		for(size_t j=0; j<data.size(); j++) {
+			if ((j+1)%100==0)
+				_experiment.log() << "processing sample " <<j<< " out of "<<data.size()<<"\n";
 			process.process_train_sample(data[j].first, data[j].second, i, j, data.size());
 
 			if(i == n-1 && data[j].second.shape() != process.shape()) {

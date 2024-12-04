@@ -104,7 +104,9 @@ private:
 		}
 
 		try {
-			Experiment<Execution> experiment(name);
+			int argc=0;
+			char **argv=NULL;
+			Experiment<Execution> experiment(argc,argv,name);
 			Handler<Execution>::run(experiment, configuration);
 			experiment.run(std::numeric_limits<size_t>::max());
 		} catch(std::exception& e) {

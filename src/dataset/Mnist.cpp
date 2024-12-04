@@ -40,7 +40,7 @@ std::pair<std::string, Tensor<InputType>> Mnist::next() {
 		}
 	}
 
-	// Tensor<float>::draw_Mnist_tensor("/home/melassal/Workspace/Draw/Mnist/Raw_" + std::to_string(label) + "_" + std::to_string(_cursor) + "_", out.second);
+	Tensor<float>::draw_Mnist_tensor("Draw/Mnist/Raw_" + std::to_string(label) + "_" + std::to_string(_cursor) + "_", out.second);
 
 	_cursor++;
 

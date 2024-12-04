@@ -197,6 +197,7 @@ void Convolution::process_test_sample(const std::string& label, Tensor<float>& s
 		_current_height = _height;
 	}
 
+	//std::cout << "Process test sample " << number << " " << current_index << " label : " << label << std::endl;
 	std::vector<Spike> input_spike;
 	SpikeConverter::to_spike(sample, input_spike);
 	std::vector<Spike> output_spike;
@@ -628,12 +629,12 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 	if(_model._wta_infer) {
 		_wta.fill(false);
 	}
-
 	for(const Spike& spike : input_spike) {
 
 		// Get the spatial position of output neurons integrating inputs coming from the spatial position of the input spike
 		// NOTE: output_spikes should be called pos_to_process or something like that
 		std::vector<std::tuple<uint16_t, uint16_t, uint16_t, uint16_t>> output_spikes;
+
 		_model.forward(spike.x, spike.y, output_spikes);
 
 		// Iterate over output neuron spatial positions 
@@ -673,7 +674,9 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 					// Deactivate the neuron
 					_inh.at(x, y, z) = true;
 					// Add WTA on the spatial position
-					_wta.at(x, y) = true;
+					if (_model._wta_infer) {
+						_wta.at(x, y) = true;
+					}
 				}
 			}
 		}

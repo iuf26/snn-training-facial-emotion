@@ -219,10 +219,17 @@ class Experiment : public AbstractExperiment {
 
 public:
 	template<typename... Args>
-	Experiment(int& argc, char** argv, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
+	Experiment(int& argc, char** argv, const std::string& name, Args&&... args) :
+		AbstractExperiment(argc, argv, "result", "model", name, 42, true), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
+
+	}
+
+	template<typename... Args>
+	Experiment(char** argv, int& argc, const std::string& output_path, const std::string& model_path, const std::string& name, int seed, bool log_to_file, Args&&... args) :
 		AbstractExperiment(argc, argv, output_path, model_path, name, seed, log_to_file), _execution(*this, std::forward<Args>(args)...), _train_set(), _test_set() {
 
 	}
+
 
 	virtual void process(size_t refresh_interval) {
 		_execution.process(refresh_interval);

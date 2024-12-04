@@ -106,10 +106,10 @@ int main(int argc, char** argv) {
 	AbstractExperiment* experiment;
 	std::string exp_name = "test";
 	if (config["use_sparse"] == true) {
-		experiment = new Experiment<TestingSparseExecution>(argc, argv, output_path, model_path, exp_name, 0, false);
+		experiment = new Experiment<TestingSparseExecution>(argv, argc, output_path, model_path, exp_name, 0, false);
 	}
 	else {
-		experiment = new Experiment<TestingExecution>(argc, argv, output_path, model_path, exp_name, 0, false);
+		experiment = new Experiment<TestingExecution>(argv, argc, output_path, model_path, exp_name, 0, false);
 	}
 
 	// Load dataset

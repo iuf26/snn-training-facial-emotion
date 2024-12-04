@@ -76,8 +76,8 @@ void load_dataset(AbstractExperiment *experiment, std::string &data_path, std::s
 	} 
 	else if (dataset == "SPIKES_MNIST") 
 	{
-		width = 6;
-		height = 6;
+		width = 12;
+		height = 12;
 		depth = 64;
 		spike = 1;
 	}
@@ -142,11 +142,11 @@ int main(int argc, char **argv)
 	std::string model_path = output_path + "/model/";
 	if (config["use_sparse"] == true)
 	{
-		experiment = new Experiment<TrainingSparseExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingSparseExecution>(argv, argc, output_path, model_path, exp_name, seed, true);
 	}
 	else
 	{
-		experiment = new Experiment<TrainingExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingExecution>(argv, argc, output_path, model_path, exp_name, seed, true);
 	}
 
 	// Save config path to the model directory

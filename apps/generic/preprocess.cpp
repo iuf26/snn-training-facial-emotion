@@ -106,10 +106,10 @@ int main(int argc, char** argv) {
 	std::string exp_name = "train";
 	std::string model_path = output_path + "/model/";
 	if (config["use_sparse"] == true) {
-		experiment = new Experiment<TrainingSparseExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingSparseExecution>(argv, argc, output_path, model_path, exp_name, seed, true);
 	}
 	else {
-		experiment = new Experiment<TrainingExecution>(argc, argv, output_path, model_path, exp_name, seed, true);
+		experiment = new Experiment<TrainingExecution>(argv, argc, output_path, model_path, exp_name, seed, true);
 	}
 
 	// Save config path to the model directory

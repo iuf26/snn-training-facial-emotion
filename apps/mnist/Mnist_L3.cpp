@@ -35,8 +35,8 @@ int main(int argc, char **argv)
 
 	std::string input_path(input_path_ptr);
 
-	experiment.add_train<dataset::Mnist>(input_path + "train-images.idx3-ubyte", input_path + "train-labels.idx1-ubyte");
-	experiment.add_test<dataset::Mnist>(input_path + "t10k-images.idx3-ubyte", input_path + "t10k-labels.idx1-ubyte");
+	experiment.add_train<dataset::Mnist>(input_path + "train-images.idx3-ubyte", input_path + "train-labels.idx1-ubyte",1000);
+	experiment.add_test<dataset::Mnist>(input_path + "t10k-images.idx3-ubyte", input_path + "t10k-labels.idx1-ubyte",100);
 
 	float th_lr = 0.1f;
 	float w_lr = 1.0f;

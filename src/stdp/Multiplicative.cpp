@@ -17,6 +17,12 @@ Multiplicative::Multiplicative(float ap, float am, float beta) : Multiplicative(
     parameter<float>("beta").set(beta);
 }
 
+Multiplicative::Multiplicative(float apam, float beta) : Multiplicative() {
+	parameter<float>("ap").set(apam);
+	parameter<float>("am").set(apam);
+    parameter<float>("beta").set(beta);
+}
+
 float Multiplicative::process(float w, const Time pre, Time post) {
 	float v = pre <= post ? w+_ap*std::exp(-_beta*w) :  w-_am*std::exp(_beta*(w-1.0f));
 	return std::max<float>(0, std::min<float>(1, v));

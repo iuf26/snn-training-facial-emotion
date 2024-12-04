@@ -10,10 +10,10 @@ Biological::Biological() : STDP(_register), _ap(0), _am(0), _tau(0) {
 	add_parameter("tau", _tau);
 }
 
-Biological::Biological(float alpha, Time tau) : STDP(_register), _ap(alpha), _am(alpha), _tau(tau) {
-	add_parameter("ap", alpha);
-	add_parameter("am", alpha);
-	add_parameter("tau", tau);
+Biological::Biological(float alpha, Time tau) : Biological() {
+	parameter<float>("ap").set(alpha);
+	parameter<float>("am").set(alpha);
+	parameter<float>("tau").set(tau);
 }
 
 

@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 		conv3.parameter<STDP>("stdp").set<stdp::Biological>(w_lr, 0.1f);
 
 		auto &conv1_out = experiment.output<TimeObjectiveOutput>(conv1, t_obj);
-		conv1_out.add_postprocessing<process::SaveFeatures>(experiment.name(), conv1.name());
+		//conv1_out.add_postprocessing<process::SaveFeatures>(experiment.name(), conv1.name());
 		conv1_out.add_postprocessing<process::SumPooling>(20, 20);
 		conv1_out.add_postprocessing<process::FeatureScaling>();
 		conv1_out.add_analysis<analysis::Activity>();
@@ -146,7 +146,7 @@ int main(int argc, char **argv)
 		conv1_out.add_analysis<analysis::Svm>();
 
 		auto &conv2_out = experiment.output<TimeObjectiveOutput>(conv2, t_obj1);
-		conv2_out.add_postprocessing<process::SaveFeatures>(experiment.name(), conv2.name());
+		//conv2_out.add_postprocessing<process::SaveFeatures>(experiment.name(), conv2.name());
 		conv2_out.add_postprocessing<process::SumPooling>(20, 20);
 		// conv2_out.add_postprocessing<process::ResidualConnection>(experiment.name(), "");
 		conv2_out.add_postprocessing<process::FeatureScaling>();

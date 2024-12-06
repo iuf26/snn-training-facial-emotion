@@ -37,7 +37,6 @@ std::string get_build_path()
 	return path;
 }
 
-
 void load_dataset(AbstractExperiment *experiment, std::string &data_path, std::string &label_path, std::string &dataset)
 {
 	int width = 0;
@@ -62,19 +61,13 @@ void load_dataset(AbstractExperiment *experiment, std::string &data_path, std::s
 		height = 96;
 		depth = 3;
 	}
-	else if (dataset == "STL10-64")
-	{
-		width = 64;
-		height = 64;
-		depth = 3;
-	}
 	else if (dataset == "ETH80")
 	{
 		width = 100;
 		height = 100;
 		depth = 3;
-	} 
-	else if (dataset == "SPIKES_MNIST") 
+	}
+	else if (dataset == "SPIKES_MNIST")
 	{
 		width = 12;
 		height = 12;
@@ -85,8 +78,8 @@ void load_dataset(AbstractExperiment *experiment, std::string &data_path, std::s
 	{
 		throw std::runtime_error("Dataset loader for " + dataset + " is not implemented");
 	}
-	if (spike == 0) 
-	{ 
+	if (spike == 0)
+	{
 		experiment->add_train<dataset::ImageBin>(data_path, label_path, width, height, depth, dataset);
 	}
 	else
@@ -163,7 +156,7 @@ int main(int argc, char **argv)
 	// Preprocessing
 	if (config.containsKey("whiten") && config["whiten"] == true)
 	{
-		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/whiten-filters/" + dataset_name);
+		experiment->push<process::WhitenPatchesLoader>(get_build_path() + "/../whiten-filters/" + dataset_name);
 		experiment->push<process::SeparateSign>();
 	}
 	else
@@ -172,9 +165,9 @@ int main(int argc, char **argv)
 		{
 			experiment->push<process::GrayScale>();
 		}
-		if (config.containsKey("dog") && config["dog"] == true)
+		if (!config["dog"].isNull())
 		{
-			experiment->push<process::DefaultOnOffFilter>(7, 1, 2);
+			experiment->push<process::DefaultOnOffFilter>(config["dog"][0], config["dog"][1], config["dog"][2]);
 		}
 	}
 	if (config["feature_scaling"] == true)
@@ -185,6 +178,7 @@ int main(int argc, char **argv)
 	{
 		experiment->push<LatencyCoding>();
 	}
+
 	// Convolutional layer
 	int conv1_k_w;
 	int conv1_k_h;
@@ -207,7 +201,7 @@ int main(int argc, char **argv)
 	conv1.parameter<float>("lr_th").set(config["conv1_lr_th"]);
 	conv1.parameter<bool>("wta_infer").set(config["conv1_wta_infer"]);
 	conv1.parameter<bool>("inhibition").set(config["inhibition"]);
-	conv1.parameter<bool>("save_weights").set(config["inhibition"]);
+	conv1.parameter<bool>("save_weights").set(config["save_weights"]);
 	conv1.parameter<bool>("draw").set(config["draw"]);
 	conv1.parameter<Tensor<float>>("w").distribution<distribution::Gaussian>(config["conv1_w_init_mean"], config["conv1_w_init_std"]);
 	conv1.parameter<Tensor<float>>("th").distribution<distribution::Constant>(config["conv1_th"].as<float>());

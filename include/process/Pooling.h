@@ -144,6 +144,7 @@ namespace process
 		size_t _height;
 		size_t _depth;
 	};
+
 }
 
 #endif

@@ -29,8 +29,8 @@ class AbstractExperiment {
 	friend class Layer;
 
 public:
-	AbstractExperiment(const std::string &name);
-	AbstractExperiment(int &argc, char **argv, const std::string &name);
+//	AbstractExperiment(const std::string &name);
+//	AbstractExperiment(int &argc, char **argv, const std::string &name);
 	AbstractExperiment(const AbstractExperiment &that) = delete;
 	virtual ~AbstractExperiment();
 

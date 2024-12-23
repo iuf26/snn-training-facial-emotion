@@ -15,11 +15,15 @@ ImageBin::ImageBin(const std::string& image_filename, const std::string& label_f
 		throw std::runtime_error("Can't open "+label_filename);
 	}
 
+	count=0;
+
 	_prepare_next();
 }
 
 bool ImageBin::has_next() const {
-	return !_label_file.eof();
+// for debugging purposes ... use only a small amount of samples
+//	return !_label_file.eof() && count<100;
+	return !_label_file.eof() ;
 }
 
 
@@ -36,6 +40,8 @@ std::pair<std::string, Tensor<InputType>> ImageBin::next() {
 			}
 		}
 	}
+
+	count++;
 
 	_prepare_next();
 

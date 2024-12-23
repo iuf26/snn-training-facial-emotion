@@ -41,6 +41,8 @@ namespace dataset {
 
 		Shape _shape;
 
+		int count;
+
 		uint8_t _next_label;
 
 		std::string _name;

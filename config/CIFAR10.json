@@ -26,7 +26,7 @@
     "pool1_size": 4,
 
     "use_sparse": false,
-    "inhibition": false,
+    "inhibition": true,
     "save_weights": false,
     "draw": false
 }

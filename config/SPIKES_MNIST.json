@@ -19,7 +19,7 @@
 
     "pool1_size": 2,
     
-    "inhibition": false,
+    "inhibition": true,
     "save_weights": false,
 
     "use_sparse": false,

@@ -49,3 +49,6 @@ Run MNIST Example:
 ```
 export INPUT_PATH=/path/to/mnist/
 ./Mnist
+
+## Technical documentation (draft)
+https://www.overleaf.com/read/gdzggfzyxbdq#3bb688

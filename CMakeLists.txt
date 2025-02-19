@@ -11,6 +11,8 @@ else()
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(LIBRARY_NAME "CSNNS" CACHE STRING "Name of library")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
@@ -34,6 +36,12 @@ find_package(LAPACK REQUIRED)
 message(STATUS ${LAPACK_INCLUDES})
 
 file(GLOB_RECURSE SOURCES src/* include/*)
+list(FILTER SOURCES EXCLUDE REGEX "apps/benchmarks/Bench7\\.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "apps/benchmarks/BenchCifar10WP\\.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "apps/cifar/Cifar10_L1\\.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "apps/cifar/Cifar10_L2\\.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "apps/whitening/GenerateCifar10Whiten\\.cpp")
+list(FILTER SOURCES EXCLUDE REGEX "apps/whitening/GenerateSTL10Whiten\\.cpp")
 include_directories(include/ ${LAPACK_INCLUDES})
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
@@ -54,19 +62,20 @@ endif()
 
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS ${APPS_FLAGS})
-target_link_libraries(${LIBRARY_NAME} ${BLAS_LIBRARIES} ${LAPACK_lapack_LIBRARY} libsvm Threads::Threads ${OpenCV_LIBS} tbb)
+target_link_libraries(${LIBRARY_NAME} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} libsvm Threads::Threads ${OpenCV_LIBS} tbb)
 if(USE_GUI)
-    target_link_libraries(${LIBRARY_NAME} Qt4::QtCore Qt4::QtGui qcustomplot)
+   target_link_libraries(${LIBRARY_NAME} Qt4::QtCore Qt4::QtGui qcustomplot)
 endif()
-#
+
 #   Build executables
 #
-file(GLOB_RECURSE apps apps/*)
+file(GLOB_RECURSE apps apps/static_motion_modeling/*.cpp)
 foreach(app ${apps})
     get_filename_component(app_name ${app} NAME_WE)
     add_executable(${app_name} ${app})
     set_target_properties(${app_name} PROPERTIES COMPILE_FLAGS ${APPS_FLAGS})
-    target_link_libraries(${app_name} ${LIBRARY_NAME} ${BLAS_LIBRARIES} ${LAPACK_lapack_LIBRARY} Threads::Threads ${OpenCV_LIBS} tbb)
+    target_link_libraries(${app_name} ${LIBRARY_NAME} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} Threads::Threads ${OpenCV_LIBS} tbb)
+    #target_link_libraries(${app_name} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} Threads::Threads ${OpenCV_LIBS} tbb)
     if(USE_GUI)
 	target_link_libraries(${app_name} ${LIBRARY_NAME} Qt4::QtCore Qt4::QtGui)
     endif()

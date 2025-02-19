@@ -32,10 +32,9 @@ Shape MaxScaling::compute_shape(const Shape &shape)
 {
 	_height = shape.dim(0);
 	_width = shape.dim(1);
-	_depth = shape.dim(2);
-	_conv_depth = shape.dim(3);
-
-	return Shape({_height, _width, _depth, _conv_depth});
+	// _depth = shape.dim(2);
+	_conv_depth = shape.dim(2);
+	return Shape({_height, _width, _conv_depth});
 }
 
 void MaxScaling::_process(const std::string &label, Tensor<InputType> &in) const

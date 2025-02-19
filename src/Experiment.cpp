@@ -188,30 +188,36 @@ void AbstractExperiment::run(size_t refresh_interval) {
 	}
 	_log << std::endl;
 
-
-	for(size_t i=0; i<_process_list.size(); i++) {
-		current_shape = _process_list[i]->resize(current_shape);
-		_process_list[i]->_initialize(_random_generator);
-
-		_log << _process_list[i]->class_name() << " " << (i+1) << ": " << _process_list[i]->name() << " " << current_shape.to_string() << std::endl;
-		_process_list[i]->print_parameters(_log);
-		_log << std::endl;
-		_log << std::endl;
+	size_t process_list_size = _process_list.size();
+	for(size_t i = 0; i < process_list_size; i++) {
+			current_shape = _process_list[i]->resize(current_shape);
+			// auto varp = _process_list[i];
+			_log << "curent shape" << current_shape.to_string() <<std::endl;
+			_process_list[i]->_initialize(_random_generator);
+			_log << _process_list[i]->class_name() << " " << (i+1) << ": " << _process_list[i]->name() << " " << current_shape.to_string() << std::endl;
+			_process_list[i]->print_parameters(_log);
+			_log << std::endl;
+			_log << std::endl;
 	}
 
 	_log << std::endl;
-
+	_log << "For 2:" << std::endl;
 	for(size_t i=0; i<_outputs.size(); i++) {
 		size_t output_index = _outputs[i]->index();
+		if (output_index >= _process_list.size()) {
+		_log <<  "Error: Output index " << output_index << " is out of range! Max is " << _process_list.size() - 1;
+		_log << std::endl;
+		continue;
+	   }
 		Shape current_output_shape = _process_list[output_index]->shape();
 		_log << "Output " << (i+1) << " of " << _process_list[output_index]->name() << " " << current_output_shape.to_string() << ": " << _outputs[i]->name()  << std::endl;
 		_outputs[i]->converter()._initialize(_random_generator);
 		_outputs[i]->converter().print_parameters(_log);
 		_log << std::endl;
 		_log << std::endl;
-
-
+		_log << "For 3:" << std::endl;
 		for(size_t j=0; j<_outputs[i]->postprocessing().size(); j++) {
+			if (j < _outputs[i]->postprocessing().size()) {
 			_outputs[i]->postprocessing()[j]->_initialize(_random_generator);
 			_outputs[i]->postprocessing()[j]->resize(current_output_shape);
 			current_output_shape = _outputs[i]->postprocessing()[j]->shape();
@@ -219,8 +225,12 @@ void AbstractExperiment::run(size_t refresh_interval) {
 			_outputs[i]->postprocessing()[j]->print_parameters(_log);
 			_log << std::endl;
 			_log << std::endl;
+			} else {
+				_log << "Error: Accessing postprocessing[" << j << "] out of range.";
+				_log <<  std::endl;
+			}
 		}
-
+		_log << "For 4:" << std::endl;
 		for(size_t j=0; j<_outputs[i]->analysis().size(); j++) {
 			_log << "Output " << (i+1) << ", Analysis: " << (j+1) << std::endl;
 			_outputs[i]->analysis()[j]->_initialize(_random_generator);
@@ -229,6 +239,7 @@ void AbstractExperiment::run(size_t refresh_interval) {
 			_log << std::endl;
 			_log << std::endl;
 		}
+		_log << "For 5:" << std::endl;
 	}
 #ifdef ENABLE_QT
 	for(size_t i=0; i<_plots.size(); i++) {

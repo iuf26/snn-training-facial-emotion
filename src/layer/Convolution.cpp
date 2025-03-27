@@ -3,6 +3,7 @@
 #include <execution>
 #include <mutex>
 #include "dep/npy.hpp"
+#include <string>
 
 using namespace layer;
 
@@ -32,7 +33,7 @@ Convolution::Convolution() : Layer3D(_register),
 
 Convolution::Convolution(size_t filter_width, size_t filter_height, size_t filter_number,
 						 size_t stride_x, size_t stride_y, size_t padding_x, size_t padding_y) : Layer3D(_register, filter_width, filter_height, filter_number, stride_x, stride_y, padding_x, padding_y),
-																								 _inhibition(true), _draw(false), _save_weights(false), _annealing(1.0), _min_th(0), _t_obj(0), _lr_th(0), _sample_number(0), _sample_count(0),
+																								 _inhibition(true), _draw(false), _save_weights(false),  _saved_weights(0), _annealing(1.0), _min_th(0), _t_obj(0), _lr_th(0), _sample_number(0), _sample_count(0),
 																								 _w(), _th(), _stdp(nullptr), _input_depth(0), _wta_infer(false), _impl(*this)
 {
 	add_parameter("draw", _draw);
@@ -125,10 +126,43 @@ size_t Convolution::train_pass_number() const {
 	return _epoch_number+1;
 }
 
+// void cropAndSaveImage(const Tensor<float>& sample, size_t cut_sides, size_t cut_top, size_t cut_bottom, const std::string& filename) {
+//     // Convert Tensor<float> to OpenCV Mat (assuming sample.to_mat() is available)
+//     cv::Mat image = sample.to_mat();
+
+//     // Check if the image is valid
+//     if (image.empty()) {
+//         std::cerr << "Error: Image data is empty!" << std::endl;
+//         return;
+//     }
+
+//     // Get the new cropping dimensions
+//     int cropped_width = image.cols - 2 * cut_sides;  // Crop from both sides
+//     int cropped_height = image.rows - cut_top - cut_bottom;  // Crop from top and bottom
+
+//     // Ensure valid crop dimensions
+//     if (cropped_width <= 0 || cropped_height <= 0) {
+//         std::cerr << "Error: Cropped dimensions are invalid!" << std::endl;
+//         return;
+//     }
+
+//     // Define cropping rectangle
+//     cv::Rect crop_region(cut_sides, cut_top, cropped_width, cropped_height);
+
+//     // Crop the image
+//     cv::Mat cropped_image = image(crop_region);
+//     if (cv::imwrite(filename, cropped_image)) {
+//         std::cout << "Saved cropped image to " << filename << std::endl;
+//     } else {
+//         std::cerr << "Error: Failed to save the image!" << std::endl;
+//     }
+// }
+
 void Convolution::process_train_sample(const std::string& label, Tensor<float>& sample, size_t current_pass, size_t current_index, size_t number) {
 
 	if(current_index == 0) {
 		if(current_pass < _epoch_number) {
+			_current_epoch_number = current_pass;
 			_current_width = 1;
 			_current_height = 1;
 			std::cout << "Epoch " << current_pass << "/" << _epoch_number << std::endl;
@@ -148,14 +182,26 @@ void Convolution::process_train_sample(const std::string& label, Tensor<float>& 
 	if(current_pass < _epoch_number) {
 		size_t x = 0;
 		size_t y = 0;
+		size_t _cut_sides = 20;
+		size_t _cut_top = 50;
+		size_t _cut_bottom = 50;
 
-		if(_filter_width < _width) {
-			std::uniform_int_distribution<size_t> rand_x(0, _width-_filter_width);
+		// if(_filter_width < _width) {
+		// 	std::uniform_int_distribution<size_t> rand_x(0, _width-_filter_width);
+		// 	x = rand_x(experiment()->random_generator());
+		// }
+
+		// if(_filter_height < _height) {
+		// 	std::uniform_int_distribution<size_t> rand_y(0, _height-_filter_height);
+		// 	y = rand_y(experiment()->random_generator());
+		// }
+		if (_filter_width < (_width - 2 * _cut_sides)) {
+			std::uniform_int_distribution<size_t> rand_x(_cut_sides, _width - _cut_sides - _filter_width);
 			x = rand_x(experiment()->random_generator());
 		}
 
-		if(_filter_height < _height) {
-			std::uniform_int_distribution<size_t> rand_y(0, _height-_filter_height);
+		if (_filter_height < (_height - _cut_top - _cut_bottom)) {
+			std::uniform_int_distribution<size_t> rand_y(_cut_top, _height - _cut_bottom - _filter_height);
 			y = rand_y(experiment()->random_generator());
 		}
 
@@ -562,7 +608,9 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike> &input_spike, const 
 	_label.erase(0, _expName.length() + delimiter.length());
 	std::string _layerIndex = _label.substr(0, _label.find(delimiter));
 	_label.erase(0, _layerIndex.length() + delimiter.length());
-	//////////////////////////////
+	if (_model._save_weights){
+		std::filesystem::create_directories(_model._file_path + "/Weights/" + _expName + "/" + _layerIndex + "/");
+	}
 
 	size_t depth = _model.depth();
 	Tensor<float> &w = _model._w;
@@ -592,6 +640,7 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike> &input_spike, const 
 					for (size_t y = 0; y < _model._filter_height; y++)
 						for (size_t zi = 0; zi < _model._input_depth; zi++)
 							w.at(x, y, zi, z) = _model._stdp->process(w.at(x, y, zi, z), input_time.at(x, y, zi), spike.time);
+				
 
 				if (_model._current_epoch_number == _model._epoch_number - 1 && _model._draw)
 				{
@@ -603,11 +652,16 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike> &input_spike, const 
 						_model._drawn_weights = 1;
 					}
 				}
+				// std::cout <<"_model._saved_weights: "<< std::to_string(_model._saved_weights)<< std::endl;
+				// std::cout <<"_model._saved_weights == 0: "<< std::to_string(_model._saved_weights == 0)<< std::endl;
+				
 
-				if (_model._current_epoch_number == _model._epoch_number - 1 && _model._save_weights)
+				if (_model._current_epoch_number == _model._epoch_number - 1 && _model._save_weights && _model._saved_weights == 0)
 				{
-					std::filesystem::create_directories(_model._file_path + "/Weights/" + _expName + "/" + _layerIndex + "/");
+					std::cout <<"WE ARE HERE after"<< std::endl;
+					// std::filesystem::create_directories("/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/Weights/" + _expName + "/" + _layerIndex + "/");
 					SaveWeights(_model._file_path + "/Weights/" + _expName + "/" + _layerIndex + "/" + _expName + ".json", _label, w);
+					_model._saved_weights = 1;
 				}
 
 				if (_model._inhibition)

@@ -36,13 +36,13 @@ int main(int argc, char **argv)
 	std::string _dataset = "Image_CK+Dataset";
 	size_t _frame_size_width = 0;
 	size_t _frame_size_height = 0;
+	//DenseIntermediateExecutionNew - MAI Multa memorie necesita
 	Experiment<SparseIntermediateExecutionNew> experiment(argc, argv, _dataset, false, false);
 	experiment.push<process::DefaultOnOffFilter>(7, 1.0, 4.0);
 	const char *input_path_ptr = std::getenv("INPUT_PATH");
 	if (input_path_ptr == nullptr)
 		throw std::runtime_error("Require to define INPUT_PATH variable");
 	std::string input_path(input_path_ptr);
-	//max scaling throws a error, maybe its because its depth
 	experiment.push<process::MaxScaling>();
 	experiment.push<LatencyCoding>();
 	experiment.add_train<dataset::Image>(input_path + "/train");
@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 
 	// First convolution layer, name, width, hight, depth of filter(NUMBER OF FEATURES nf - filter number). stride x and y are fixed to 1 which means there is a big overlapping while extracting features.
 	// This function takes the following(Layer Name, Kernel width, kernel height, number of kernels, and a flag to draw the weights if 1 or not if 0)
+	//UNCOMMENTED
 	// auto &conv1 = experiment.push<layer::Convolution>(5, 5, 16);
 	// conv1.set_name("conv1");
 	// conv1.parameter<bool>("draw").set(false);
@@ -71,6 +72,7 @@ int main(int argc, char **argv)
 	// conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	// conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(8.0, 0.1);
 	// conv1.parameter<STDP>("stdp").set<stdp::Biological>(w_lr, 0.1f);
+	// //UNCOMMENTED
 
 	// auto &pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	// pool1.set_name("pool1");
@@ -92,9 +94,11 @@ int main(int argc, char **argv)
 
 	// auto &pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	// pool2.set_name("pool2");
-	//auto &fc1 = experiment.push<layer::Convolution>(5, 5, 32);
-	auto &fc1 = experiment.push<layer::Convolution>(5, 5, 16);
+	// auto &fc1 = experiment.push<layer::Convolution>(5, 5, 32);
+	//UNCOMMENTED
+	auto &fc1 = experiment.push<layer::Convolution>(5, 5, 16);//weitghs convolutie
 	fc1.set_name("fc1");
+	//fc1.parameter<bool>("draw").set(true);  draweFeatureMap
 	fc1.parameter<bool>("draw").set(false);
 	fc1.parameter<bool>("save_weights").set(true);
 	fc1.parameter<bool>("inhibition").set(true);
@@ -127,12 +131,11 @@ int main(int argc, char **argv)
 	// conv2_out.add_analysis<analysis::Coherence>();
 	// conv2_out.add_analysis<analysis::Svm>();
 
-
-//--- PROBLEM COMES FROM THIS LINE:
 	auto &fc1_out = experiment.output<TimeObjectiveOutput>(fc1, t_obj2);
 	fc1_out.add_postprocessing<process::SumPooling>(20, 20);
 	fc1_out.add_postprocessing<process::FeatureScaling>();
 	fc1_out.add_analysis<analysis::Activity>();
+	//save SVM model
 	fc1_out.template add_analysis<analysis::Svm>();
 	
 	experiment.run(10000);

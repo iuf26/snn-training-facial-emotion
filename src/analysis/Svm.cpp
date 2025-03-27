@@ -1,10 +1,24 @@
 #include "analysis/Svm.h"
 
 #include "Experiment.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
 
 using namespace analysis;
 
 static RegisterClassParameter<Svm, AnalysisFactory> _register("Svm");
+
+void saveMatrix(const cv::Mat& mat, const std::string& filename) {
+    cv::FileStorage fs(filename, cv::FileStorage::WRITE);
+    if (!fs.isOpened()) {
+        std::cerr << "Error: Cannot open file " << filename << std::endl;
+        return;
+    }
+    fs << "data" << mat;  // Write the matrix with a label
+    fs.release();  // Close the file
+    std::cout << "Saved " << filename << " successfully." << std::endl;
+}
+
 
 Svm::Svm() : TwoPassAnalysis(_register),
 			 _c(0), _label_index(), _size(0), _node_count(0), _sample_count(0),
@@ -122,6 +136,13 @@ void Svm::after_train() {
 
 	experiment().print() << "Train svm" << std::endl;
 	_model = ::svm_train(&_problem, &parameters);
+
+	 std::string model_path = "/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/trained_model_16march.svm"; // Change the filename if needed
+    if (svm_save_model(model_path.c_str(), _model) == 0) {
+        experiment().print() << "SVM model saved to " << model_path << std::endl;
+    } else {
+        experiment().print() << "Error saving SVM model!" << std::endl;
+    }	
 }
 
 void Svm::before_test() {

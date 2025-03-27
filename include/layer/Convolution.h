@@ -115,6 +115,7 @@ namespace layer
 		uint32_t _sample_number;
 		uint32_t _sample_count;
 		uint32_t _drawn_weights;
+		uint32_t _saved_weights;
 		std::string _file_path;
 
 		float _annealing;

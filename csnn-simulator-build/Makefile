@@ -156,6 +156,19 @@ Images_LOO/fast:
 .PHONY : Images_LOO/fast
 
 #=============================================================================
+# Target rules for targets named InferenceTestModel
+
+# Build rule for target.
+InferenceTestModel: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 InferenceTestModel
+.PHONY : InferenceTestModel
+
+# fast build rule for target.
+InferenceTestModel/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/InferenceTestModel.dir/build.make CMakeFiles/InferenceTestModel.dir/build
+.PHONY : InferenceTestModel/fast
+
+#=============================================================================
 # Target rules for targets named MotionGrid
 
 # Build rule for target.
@@ -241,6 +254,30 @@ apps/static_motion_modeling/Images_LOO.s: apps/static_motion_modeling/Images_LOO
 apps/static_motion_modeling/Images_LOO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Images_LOO.dir/build.make CMakeFiles/Images_LOO.dir/apps/static_motion_modeling/Images_LOO.cpp.s
 .PHONY : apps/static_motion_modeling/Images_LOO.cpp.s
+
+apps/static_motion_modeling/InferenceTestModel.o: apps/static_motion_modeling/InferenceTestModel.cpp.o
+.PHONY : apps/static_motion_modeling/InferenceTestModel.o
+
+# target to build an object file
+apps/static_motion_modeling/InferenceTestModel.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/InferenceTestModel.dir/build.make CMakeFiles/InferenceTestModel.dir/apps/static_motion_modeling/InferenceTestModel.cpp.o
+.PHONY : apps/static_motion_modeling/InferenceTestModel.cpp.o
+
+apps/static_motion_modeling/InferenceTestModel.i: apps/static_motion_modeling/InferenceTestModel.cpp.i
+.PHONY : apps/static_motion_modeling/InferenceTestModel.i
+
+# target to preprocess a source file
+apps/static_motion_modeling/InferenceTestModel.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/InferenceTestModel.dir/build.make CMakeFiles/InferenceTestModel.dir/apps/static_motion_modeling/InferenceTestModel.cpp.i
+.PHONY : apps/static_motion_modeling/InferenceTestModel.cpp.i
+
+apps/static_motion_modeling/InferenceTestModel.s: apps/static_motion_modeling/InferenceTestModel.cpp.s
+.PHONY : apps/static_motion_modeling/InferenceTestModel.s
+
+# target to generate assembly for a file
+apps/static_motion_modeling/InferenceTestModel.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/InferenceTestModel.dir/build.make CMakeFiles/InferenceTestModel.dir/apps/static_motion_modeling/InferenceTestModel.cpp.s
+.PHONY : apps/static_motion_modeling/InferenceTestModel.cpp.s
 
 apps/static_motion_modeling/MotionGrid.o: apps/static_motion_modeling/MotionGrid.cpp.o
 .PHONY : apps/static_motion_modeling/MotionGrid.o
@@ -2941,6 +2978,7 @@ help:
 	@echo "... CSNNS"
 	@echo "... Images"
 	@echo "... Images_LOO"
+	@echo "... InferenceTestModel"
 	@echo "... MotionGrid"
 	@echo "... SpikeMotion"
 	@echo "... libsvm"
@@ -2950,6 +2988,9 @@ help:
 	@echo "... apps/static_motion_modeling/Images_LOO.o"
 	@echo "... apps/static_motion_modeling/Images_LOO.i"
 	@echo "... apps/static_motion_modeling/Images_LOO.s"
+	@echo "... apps/static_motion_modeling/InferenceTestModel.o"
+	@echo "... apps/static_motion_modeling/InferenceTestModel.i"
+	@echo "... apps/static_motion_modeling/InferenceTestModel.s"
 	@echo "... apps/static_motion_modeling/MotionGrid.o"
 	@echo "... apps/static_motion_modeling/MotionGrid.i"
 	@echo "... apps/static_motion_modeling/MotionGrid.s"

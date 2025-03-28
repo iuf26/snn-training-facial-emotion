@@ -16,6 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(LIBRARY_NAME "CSNNS" CACHE STRING "Name of library")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
+
 # set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -28,6 +29,7 @@ if(USE_GUI)
 endif()
 
 find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS} /usr/include/libsvm)
 find_package(Threads REQUIRED)
 
 find_package(BLAS REQUIRED)

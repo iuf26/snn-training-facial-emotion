@@ -139,6 +139,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/CSNNS.dir/DependInfo.cmake"
   "CMakeFiles/Images.dir/DependInfo.cmake"
   "CMakeFiles/Images_LOO.dir/DependInfo.cmake"
+  "CMakeFiles/InferenceTestModel.dir/DependInfo.cmake"
   "CMakeFiles/MotionGrid.dir/DependInfo.cmake"
   "CMakeFiles/SpikeMotion.dir/DependInfo.cmake"
   "dep/libsvm/CMakeFiles/libsvm.dir/DependInfo.cmake"

@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	// conv1.parameter<Tensor<float>>("w").distribution<distribution::Uniform>(0.0, 1.0);
 	// conv1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(8.0, 0.1);
 	// conv1.parameter<STDP>("stdp").set<stdp::Biological>(w_lr, 0.1f);
-	// //UNCOMMENTED
+
 
 	// auto &pool1 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	// pool1.set_name("pool1");
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 	// auto &pool2 = experiment.push<layer::Pooling>(2, 2, 2, 2);
 	// pool2.set_name("pool2");
 	// auto &fc1 = experiment.push<layer::Convolution>(5, 5, 32);
-	//UNCOMMENTED
+	// //UNCOMMENTED
 	auto &fc1 = experiment.push<layer::Convolution>(5, 5, 16);//weitghs convolutie
 	fc1.set_name("fc1");
 	//fc1.parameter<bool>("draw").set(true);  draweFeatureMap

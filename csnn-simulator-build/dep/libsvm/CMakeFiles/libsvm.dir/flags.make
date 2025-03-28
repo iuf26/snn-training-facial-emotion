@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -Dlibsvm_EXPORTS
 
-CXX_INCLUDES = -I"/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/csnn-simulator-build/dep/libsvm" -I"/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/dep/libsvm" -I"/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/include" -I/usr/include/opencv4
+CXX_INCLUDES = -I"/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/csnn-simulator-build/dep/libsvm" -I"/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/dep/libsvm" -I/usr/include/opencv4 -I/usr/include/libsvm -I"/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/include"
 
 CXX_FLAGS = -O3 -DNDEBUG -fPIC -std=c++17
 

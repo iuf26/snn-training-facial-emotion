@@ -189,24 +189,24 @@ int main(int argc, char** argv) {
         }
         // >>> COMPUTE SHAPE BEFORE LOADING WEIGHTS <<<
         // std::cout << "reconverted tensor shape: " <<  reconverted_tensor.shape().to_string() << std::endl;
-        conv.compute_shape(reconverted_tensor.shape());
-        // std::cout << "[INFO CONV]Conv output shape: " << conv.shape().to_string() << std::endl;
+        conv.compute_shape(tensor.shape());
+        std::cout << "[INFO CONV]Conv output shape: " << tensor.shape().to_string() << std::endl;
 
         load_convolution_weights_from_json(conv, model_dir + "/weights.json");
 
 
         Tensor<float> thresholds(Shape({conv.depth()}));
-        std::fill(thresholds.begin(), thresholds.end(), 10.0f);
+        std::fill(thresholds.begin(), thresholds.end(), 1.0f);
         conv.set_thresholds(thresholds);
-        std::cout << "thresholds set shape: " << reconverted_tensor.shape().to_string() << std::endl;
+        // std::cout << "thresholds set shape: " << reconverted_tensor.shape().to_string() << std::endl;
         conv.process_test_sample_inference(label, reconverted_tensor, 0, image_paths.size());
         std::cout << "After conv.process_test_sample " <<  reconverted_tensor.shape().to_string() << std::endl;
         // Continue with feature processing
         sum_pool.process_test(label, reconverted_tensor);
-        std::cout << "After sum_pool.process_test" <<  reconverted_tensor.shape().to_string() << std::endl;
+        // std::cout << "After sum_pool.process_test" <<  reconverted_tensor.shape().to_string() << std::endl;
 
         scaling.process_test(label, reconverted_tensor);
-        std::cout << "after scaling.process_test " <<  reconverted_tensor.shape().to_string() << std::endl;
+        // std::cout << "after scaling.process_test " <<  reconverted_tensor.shape().to_string() << std::endl;
 
 
         std::vector<float> flat_feature;

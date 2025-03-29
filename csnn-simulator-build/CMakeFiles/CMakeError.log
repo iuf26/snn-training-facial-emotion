@@ -1,19 +1,19 @@
 Determining if the function sgemm_ exists failed with the following output:
 Change Dir: /home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/csnn-simulator-build/CMakeFiles/CMakeTmp
 
-Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_2287c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_2287c.dir/build.make CMakeFiles/cmTC_2287c.dir/build
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f4e91/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f4e91.dir/build.make CMakeFiles/cmTC_f4e91.dir/build
 gmake[1]: Entering directory '/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/csnn-simulator-build/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_2287c.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgemm_ -o CMakeFiles/cmTC_2287c.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
-Linking C executable cmTC_2287c
-/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2287c.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sgemm_ -rdynamic CMakeFiles/cmTC_2287c.dir/CheckFunctionExists.c.o -o cmTC_2287c 
-/usr/bin/ld: CMakeFiles/cmTC_2287c.dir/CheckFunctionExists.c.o: în funcția „main”:
+Building C object CMakeFiles/cmTC_f4e91.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=sgemm_ -o CMakeFiles/cmTC_f4e91.dir/CheckFunctionExists.c.o -c /usr/share/cmake-3.22/Modules/CheckFunctionExists.c
+Linking C executable cmTC_f4e91
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f4e91.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=sgemm_ -rdynamic CMakeFiles/cmTC_f4e91.dir/CheckFunctionExists.c.o -o cmTC_f4e91 
+/usr/bin/ld: CMakeFiles/cmTC_f4e91.dir/CheckFunctionExists.c.o: în funcția „main”:
 CheckFunctionExists.c:(.text+0x14): referință nedefinită la „sgemm_”
 collect2: error: ld returned 1 exit status
-gmake[1]: *** [CMakeFiles/cmTC_2287c.dir/build.make:99: cmTC_2287c] Error 1
+gmake[1]: *** [CMakeFiles/cmTC_f4e91.dir/build.make:99: cmTC_f4e91] Error 1
 gmake[1]: Leaving directory '/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/csnn-simulator/csnn-simulator-build/CMakeFiles/CMakeTmp'
-gmake: *** [Makefile:127: cmTC_2287c/fast] Error 2
+gmake: *** [Makefile:127: cmTC_f4e91/fast] Error 2
 
 
 

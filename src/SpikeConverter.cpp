@@ -79,6 +79,8 @@ void SpikeConverter::to_spike(const Tensor<Time> &in, std::vector<Spike> &out, s
 void SpikeConverter::from_spike(const std::vector<Spike> &in, Tensor<Time> &out)
 {
 	out.fill(INFINITE_TIME);
+	std::cout << "[DEBUG] from_spike: output tensor shape = " << out.shape().to_string() << std::endl;
+
 	if (out.shape().number() == 3)
 		for (const Spike &spike : in)
 		{

@@ -251,7 +251,24 @@ void Convolution::process_test_sample(const std::string& label, Tensor<float>& s
 }
 
 void Convolution::process_test_sample_inference(const std::string& label, Tensor<float>& sample, size_t current_index, size_t number) {
-	if (current_index == 0) {
+	// if (current_index == 0) {
+	// 	_current_width = _width;
+	// 	_current_height = _height;
+	// }
+	// std::vector<Spike> input_spike;
+	// SpikeConverter::to_spike(sample, input_spike);
+	// std::vector<Spike> output_spike;
+	// _sample_number = number;
+	// test(label, input_spike, sample, output_spike);
+	// std::cout << "[DEBUG] output_spike.size(): " << output_spike.size() << std::endl;
+	// Shape out_shape(_width, _height, _depth);
+	// std::cout << "[DEBUG] after shape() " << std::endl;
+	// Tensor<float> output(out_shape);
+	// std::cout << "[DEBUG] output spike size number "  << std::endl;
+	// SpikeConverter::from_spike(output_spike, output);
+	// std::cout << "[DEBUG] after from_spake " << std::endl;
+	// sample = output;
+	if(current_index == 0) {
 		_current_width = _width;
 		_current_height = _height;
 	}
@@ -260,10 +277,12 @@ void Convolution::process_test_sample_inference(const std::string& label, Tensor
 	std::vector<Spike> output_spike;
 	_sample_number = number;
 	test(label, input_spike, sample, output_spike);
-	Shape out_shape = shape();
-	Tensor<float> output(out_shape);
-	SpikeConverter::from_spike(output_spike, output);
-	sample = output;
+
+	// Shape({_width, _height, _depth});
+	// sample = Tensor<float>(shape(200,200,2));
+	Tensor<float> current_tensor(sample.shape());
+	sample = current_tensor;
+	SpikeConverter::from_spike(output_spike, sample);
 }
 
 
@@ -282,7 +301,6 @@ void Convolution::on_epoch_end() {
 
 void Convolution::set_weights(const Tensor<float>& weights){
 	_w = weights;
-
      parameter<Tensor<float>>("w").set(_w);
 	 std::cout << "[DEBUG] Loaded weights shape: " 
           << _w.shape().dim(0) << ", " 

@@ -97,7 +97,7 @@ Shape DefaultOnOffFilter::compute_shape(const Shape &shape)
 
 	_height = shape.dim(0);
 	_width = shape.dim(1);
-	_depth = shape.dim(2);
+	_depth = shape.number() > 2 ? shape.dim(2) : 1;
 	_conv_depth = shape.number() > 3 ? shape.dim(3) : 1;
 	_filter = _priv::OnOffFilterHelper::generate_filter(_filter_size, _center_dev, _surround_dev);
 	if (shape.number() > 3)

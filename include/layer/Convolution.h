@@ -94,15 +94,20 @@ namespace layer
 		virtual size_t train_pass_number() const;
 		virtual void process_train_sample(const std::string &label, Tensor<float> &sample, size_t current_pass, size_t current_index, size_t number);
 		virtual void process_test_sample(const std::string &label, Tensor<float> &sample, size_t current_index, size_t number);
-
+		virtual void process_test_sample_inference(const std::string &label, Tensor<float> &sample, size_t current_index, size_t number);
 		virtual void train(const std::string &label, const std::vector<Spike> &input_spike, const Tensor<Time> &input_time, std::vector<Spike> &output_spike);
 		virtual void test(const std::string &label, const std::vector<Spike> &input_spike, const Tensor<Time> &input_time, std::vector<Spike> &output_spike);
 		virtual void on_epoch_end();
+		
 
 		virtual Tensor<float> reconstruct(const Tensor<float> &t) const;
 
 		void plot_threshold(bool only_in_train);
 		void plot_evolution(bool only_in_train);
+		void set_weights(const Tensor<float>& weights);
+		void set_thresholds(const Tensor<float>& thresholds);
+
+
 
 		virtual bool load_params(const std::string& filename);
 		virtual bool save_params(const std::string& filename);

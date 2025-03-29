@@ -61,16 +61,15 @@ Convolution::Convolution(size_t filter_width, size_t filter_height, size_t filte
 
 Shape Convolution::compute_shape(const Shape& previous_shape) {
 	Layer3D::compute_shape(previous_shape);
-
 	_input_depth = previous_shape.dim(2);
-
 	parameter<Tensor<float>>("w").shape(_filter_width, _filter_height, _input_depth, _filter_number);
 	parameter<Tensor<float>>("th").shape(_filter_number);
-
 	_impl.resize();
-
 	return Shape({_width, _height, _depth});
+
 }
+
+
 
 bool Convolution::save_params(const std::string& path) {
 	std::vector<float> weights;
@@ -238,12 +237,9 @@ void Convolution::process_train_sample(const std::string& label, Tensor<float>& 
 
 void Convolution::process_test_sample(const std::string& label, Tensor<float>& sample, size_t current_index, size_t number) {
 	if(current_index == 0) {
-		std::cout << "Process test set" << std::endl;
 		_current_width = _width;
 		_current_height = _height;
 	}
-
-	//std::cout << "Process test sample " << number << " " << current_index << " label : " << label << std::endl;
 	std::vector<Spike> input_spike;
 	SpikeConverter::to_spike(sample, input_spike);
 	std::vector<Spike> output_spike;
@@ -251,7 +247,25 @@ void Convolution::process_test_sample(const std::string& label, Tensor<float>& s
 	test(label, input_spike, sample, output_spike);
 	sample = Tensor<float>(shape());
 	SpikeConverter::from_spike(output_spike, sample);
+
 }
+
+void Convolution::process_test_sample_inference(const std::string& label, Tensor<float>& sample, size_t current_index, size_t number) {
+	if (current_index == 0) {
+		_current_width = _width;
+		_current_height = _height;
+	}
+	std::vector<Spike> input_spike;
+	SpikeConverter::to_spike(sample, input_spike);
+	std::vector<Spike> output_spike;
+	_sample_number = number;
+	test(label, input_spike, sample, output_spike);
+	Shape out_shape = shape();
+	Tensor<float> output(out_shape);
+	SpikeConverter::from_spike(output_spike, output);
+	sample = output;
+}
+
 
 void Convolution::train(const std::string&, const std::vector<Spike>& input_spike, const Tensor<Time>& input_time, std::vector<Spike>& output_spike) {
 	_impl.train(input_spike, input_time, output_spike);
@@ -264,6 +278,22 @@ void Convolution::test(const std::string&, const std::vector<Spike>& input_spike
 void Convolution::on_epoch_end() {
 	_lr_th *= _annealing;
 	_stdp->adapt_parameters(_annealing);
+}
+
+void Convolution::set_weights(const Tensor<float>& weights){
+	_w = weights;
+
+     parameter<Tensor<float>>("w").set(_w);
+	 std::cout << "[DEBUG] Loaded weights shape: " 
+          << _w.shape().dim(0) << ", " 
+          << _w.shape().dim(1) << ", " 
+          << _w.shape().dim(2) << ", " 
+          << _w.shape().dim(3) << std::endl;
+}
+void Convolution::set_thresholds(const Tensor<float>& thresholds){
+	   _th = thresholds;
+		parameter<Tensor<float>>("th").set(_th);
+
 }
 
 Tensor<float> Convolution::reconstruct(const Tensor<float>& t) const {
@@ -487,12 +517,18 @@ void _priv::ConvolutionImpl::train(const std::vector<Spike>& input_spike, const 
 }
 
 void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const Tensor<Time>&, std::vector<Spike>& output_spike) {
+		std::cout << "_priv::ConvolutionImpl start" << std::endl;
+
 	size_t depth = _model.depth();
+	std::cout << "_priv::ConvolutionImpl 1" << std::endl;
+
 	Tensor<float>& w = _model._w;
 	Tensor<float>& th = _model._th;
 
 	size_t n = depth/AVX_256_N;
 	size_t r = depth%AVX_256_N;
+
+	std::cout << "_priv::ConvolutionImpl 2" << std::endl;
 
 	__m256 __c1 = _mm256_setzero_ps();
 
@@ -514,6 +550,7 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 			}
 		}
 	}
+		std::cout << "_priv::ConvolutionImpl 3" << std::endl;
 
 	if(_model._wta_infer) {
 		_wta.fill(false);
@@ -580,6 +617,8 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 			}
 		}
 	}
+		std::cout << "_priv::ConvolutionImpl 4" << std::endl;
+
 }
 
 #else
@@ -675,14 +714,17 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 	size_t depth = _model.depth();
 	Tensor<float>& w = _model._w;
 	Tensor<float>& th = _model._th;
-
-
 	std::fill(std::begin(_a), std::end(_a), 0);
 	std::fill(std::begin(_inh), std::end(_inh), false);
-
 	if(_model._wta_infer) {
 		_wta.fill(false);
 	}
+	if (th.shape().number() > 0) {
+    std::cout << "th dims: " << th.shape().dim(0) << std::endl;
+	} else {
+		std::cerr << "[WARNING] th tensor is empty!" << std::endl;
+	}
+
 	for(const Spike& spike : input_spike) {
 
 		// Get the spatial position of output neurons integrating inputs coming from the spatial position of the input spike
@@ -691,12 +733,23 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 
 		_model.forward(spike.x, spike.y, output_spikes);
 
+
 		// Iterate over output neuron spatial positions 
 		for(const auto& entry : output_spikes) {
 			uint16_t x = std::get<0>(entry);
 			uint16_t y = std::get<1>(entry);
 			uint16_t w_x = std::get<2>(entry);
 			uint16_t w_y = std::get<3>(entry);
+			// if (x >= _a.shape().dim(0) || y >= _a.shape().dim(1)) {
+			// 	std::cerr << "[ERROR] x/y out of bounds in _a: x=" << x << ", y=" << y << std::endl;
+			// 	continue;
+			// 	}
+			// if (w_x >= w.shape().dim(0) || w_y >= w.shape().dim(1) || spike.z >= w.shape().dim(2)) {
+			// 	std::cerr << "[ERROR] weight index out of bounds: w_x=" << w_x 
+			// 			<< ", w_y=" << w_y << ", spike.z=" << spike.z << std::endl;
+			// 	continue;
+			// }
+
 
 			// WTA inhibition : one spike per spatial position
 			if(_model._wta_infer && _wta.at(x, y)) {
@@ -716,13 +769,15 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 				// BUT not in the AVX implementation because hard to do with multiprocessing 
 				//if(_model._wta_infer && _wta.at(x, y)) {
 				//	continue;
-				//}
+				//}	
 
 				// Update the membrane potential of the output neuron 
 				// with the weight associated to the input neuron 
 				_a.at(x, y, z) += w.at(w_x, w_y, spike.z, z);
+
 				// When the membrane potential reaches the threshold of the channel
 				if(_a.at(x, y, z) >= th.at(z)) {
+
 					// Add a spike to the output vector
 					output_spike.emplace_back(spike.time, x, y, z);
 					// Deactivate the neuron
@@ -736,7 +791,6 @@ void _priv::ConvolutionImpl::test(const std::vector<Spike>& input_spike, const T
 		}
 	}
 	//   });
-
 	draw_progress(_model._sample_count, _model._sample_number);
 
 	if (_model._sample_count == _model._sample_number)

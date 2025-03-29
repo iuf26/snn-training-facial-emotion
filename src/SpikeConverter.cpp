@@ -4,7 +4,7 @@ void SpikeConverter::to_spike(const Tensor<Time> &in, std::vector<Spike> &out)
 {
 	size_t width = in.shape().dim(0);
 	size_t height = in.shape().dim(1);
-	size_t depth = in.shape().dim(2);
+	size_t depth = in.shape().number() > 2 ? in.shape().dim(2) : 1;
 	size_t conv_depth = in.shape().number() > 3 ? in.shape().dim(3) : 1;
 
 	if (in.shape().number() == 3)
@@ -48,7 +48,7 @@ void SpikeConverter::to_spike(const Tensor<Time> &in, std::vector<Spike> &out, s
 {
 	size_t width = in.shape().dim(0);
 	size_t height = in.shape().dim(1);
-	size_t depth = in.shape().dim(2);
+	size_t depth = in.shape().number() > 2 ? in.shape().dim(2) : 1;
 	size_t conv_depth = in.shape().number() > 3 ? in.shape().dim(3) : 1;
 	if (in.shape().number() == 3)
 		for (size_t x = x_start; x < std::min(width, x_end); x++)

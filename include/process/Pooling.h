@@ -53,6 +53,8 @@ namespace process
 		SumPooling(size_t target_width, size_t target_height);
 
 		virtual Shape compute_shape(const Shape& shape);
+		virtual Shape compute_shape_inference(const Shape& shape);
+		
 		virtual void process_train(const std::string& label, Tensor<float>& sample);
 		virtual void process_test(const std::string& label, Tensor<float>& sample);
 

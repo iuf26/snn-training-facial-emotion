@@ -102,6 +102,8 @@ SumPooling::SumPooling() : UniquePassProcess(_registerSum),
 SumPooling::SumPooling(size_t target_width, size_t target_height) : SumPooling() {
 	parameter<size_t>("width").set(target_width);
 	parameter<size_t>("height").set(target_height);
+	_target_width = target_width;
+	_target_height = target_height;
 }
 
 Shape SumPooling::compute_shape(const Shape &shape)
@@ -110,7 +112,19 @@ Shape SumPooling::compute_shape(const Shape &shape)
 	_height = shape.dim(1);
 	_depth = shape.dim(2);
 	_conv_depth = shape.number() > 3 ? shape.dim(3) : 1;
+	return Shape({std::min<size_t>(_target_width, _width),
+				  std::min<size_t>(_target_height, _height),
+				  _depth, _conv_depth});
+}
 
+Shape SumPooling::compute_shape_inference(const Shape &shape)
+{
+	// _target_width = parameter<size_t>("width").get();
+	// _target_height = parameter<size_t>("height").get();
+	_width = shape.dim(0);
+	_height = shape.dim(1);
+	_depth = shape.dim(2);
+	_conv_depth = shape.number() > 3 ? shape.dim(3) : 1;
 	return Shape({std::min<size_t>(_target_width, _width),
 				  std::min<size_t>(_target_height, _height),
 				  _depth, _conv_depth});
@@ -129,9 +143,9 @@ void SumPooling::process_test(const std::string &, Tensor<float> &sample)
 void SumPooling::_process(Tensor<float> &in) const
 {
 
+
 	size_t output_width = std::min<size_t>(_target_width, _width);
 	size_t output_height = std::min<size_t>(_target_height, _height);
-
 	size_t filter_width = _width / output_width;
 	size_t filter_height = _height / output_height;
 

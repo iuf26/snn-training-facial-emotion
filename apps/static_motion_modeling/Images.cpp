@@ -112,10 +112,10 @@ int main(int argc, char **argv)
 	fc1.parameter<Tensor<float>>("th").distribution<distribution::Gaussian>(10.0, 0.1);
 	fc1.parameter<STDP>("stdp").set<stdp::Biological>(w_lr, 0.1f);
 
-// #ifdef ENABLE_QT
-// 	conv1.plot_threshold(true);
-// 	conv1.plot_reconstruction(true);
-// #endif
+	// #ifdef ENABLE_QT
+	// 	conv1.plot_threshold(true);
+	// 	conv1.plot_reconstruction(true);
+	// #endif
 
 	// auto &conv1_out = experiment.output<TimeObjectiveOutput>(conv1, t_obj);
 	// conv1_out.add_postprocessing<process::SumPooling>(20, 20);
@@ -133,10 +133,14 @@ int main(int argc, char **argv)
 
 	auto &fc1_out = experiment.output<TimeObjectiveOutput>(fc1, t_obj2);
 	fc1_out.add_postprocessing<process::SumPooling>(20, 20);
-	fc1_out.add_postprocessing<process::FeatureScaling>();
+	auto& scaling = fc1_out.add_postprocessing<process::FeatureScaling>();
+
 	fc1_out.add_analysis<analysis::Activity>();
 	//save SVM model
 	fc1_out.template add_analysis<analysis::Svm>();
 	
 	experiment.run(10000);
+
+	scaling.save_params("/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/params");
+
 }

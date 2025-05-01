@@ -172,7 +172,7 @@ int main(int argc, char** argv) {
             std::cerr << "Failed to load image: " << image_path << std::endl;
             continue;
         }
-          Tensor<float> tensor(Shape({static_cast<size_t>(img.rows), static_cast<size_t>(img.cols), 3}));
+              Tensor<float> tensor(Shape({static_cast<size_t>(img.rows), static_cast<size_t>(img.cols), 3}));
         for (int r = 0; r < img.rows; ++r)
             for (int c = 0; c < img.cols; ++c)
                 for (int ch = 0; ch < 3; ++ch)

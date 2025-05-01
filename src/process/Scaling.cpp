@@ -29,41 +29,15 @@ void FeatureScaling::compute(const std::string&, const Tensor<float>& sample) {
 }
 
 void FeatureScaling::process_train(const std::string&, Tensor<float>& sample) {
-	// for(size_t i=0; i<_size; i++) {
-	// 	sample.at_index(i) = _min.at_index(i) == _max.at_index(i) ? 0 : (sample.at_index(i)-_min.at_index(i))/(_max.at_index(i)-_min.at_index(i));
-	// }
-	 const float epsilon = 1e-6f;
-
-    for (size_t i = 0; i < _size; i++) {
-        float min_val = _min.at_index(i);
-        float max_val = _max.at_index(i);
-        float range = max_val - min_val;
-
-        if (std::abs(range) < epsilon) {
-            sample.at_index(i) = 0.0f;
-        } else {
-            sample.at_index(i) = (sample.at_index(i) - min_val) / range;
-        }
-    }
+	for(size_t i=0; i<_size; i++) {
+		sample.at_index(i) = _min.at_index(i) == _max.at_index(i) ? 0 : (sample.at_index(i)-_min.at_index(i))/(_max.at_index(i)-_min.at_index(i));
+	}
 }
 
 void FeatureScaling::process_test(const std::string&, Tensor<float>& sample) {
-	// for(size_t i=0; i<_size; i++) {
-	// 	sample.at_index(i) = _min.at_index(i) == _max.at_index(i) ? 0 : (sample.at_index(i)-_min.at_index(i))/(_max.at_index(i)-_min.at_index(i));
-	// }
-	const float epsilon = 1e-6f;
-
-    for (size_t i = 0; i < _size; i++) {
-        float min_val = _min.at_index(i);
-        float max_val = _max.at_index(i);
-        float range = max_val - min_val;
-
-        if (std::abs(range) < epsilon) {
-            sample.at_index(i) = 0.0f;  // Avoid division by near-zero
-        } else {
-            sample.at_index(i) = (sample.at_index(i) - min_val) / range;
-        }
-    }
+	for(size_t i=0; i<_size; i++) {
+		sample.at_index(i) = _min.at_index(i) == _max.at_index(i) ? 0 : (sample.at_index(i)-_min.at_index(i))/(_max.at_index(i)-_min.at_index(i));
+	}
 }
 
 bool FeatureScaling::save_params(const std::string& path) {

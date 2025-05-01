@@ -62,7 +62,14 @@ public:
         }
         nodes[features.size()].index = -1;
 
-        double label = svm_predict(model, nodes);
+        // double label = svm_predict(model, nodes);
+        int nr_class = svm_get_nr_class(model);
+        std::vector<double> values(nr_class * (nr_class - 1) / 2);  // decision values
+        double label = svm_predict_values(model, nodes, values.data());
+        std::cout << "[DEBUG] SVM decision values: ";
+        for (double v : values)
+            std::cout << v << " ";
+        std::cout << std::endl;
         delete[] nodes;
         return label;
     }
@@ -74,19 +81,15 @@ void load_convolution_weights_from_json(layer::Convolution& conv_layer, const st
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open JSON file at: " + json_path);
     }
-
     json j;
     file >> j;
-
     int dim_0 = j["dim_0"];
     int dim_1 = j["dim_1"];
     int dim_2 = j["dim_2"];
     int dim_3 = j["dim_3"];
     const std::vector<float>& data = j["data"];
-
     Tensor<float> weights(Shape({(size_t)dim_0, (size_t)dim_1, (size_t)dim_2, (size_t)dim_3}));
     std::copy(data.begin(), data.end(), weights.begin());
-
     // conv_layer.parameter<Tensor<float>>("w").set(weights);
     conv_layer.set_weights(weights);
     std::cout << "[INFO] Loaded convolution weights from " << json_path << std::endl;
@@ -94,28 +97,43 @@ void load_convolution_weights_from_json(layer::Convolution& conv_layer, const st
 }
 
 void save_tensor_as_image(const Tensor<float>& tensor, const std::string& path) {
-      const Shape& shape = tensor.shape();
-      std::cout << "[DEBUG] Saving tensor with shape: ";
+    //   const Shape& shape = tensor.shape();
+    //   std::cout << "[DEBUG] Saving tensor with shape: ";
   
-    if (const_cast<Tensor<float>&>(tensor).shape().number() < 2) {
-        std::cerr << "[WARN] Tensor has less than 2 dimensions. Skipping save to: " << path << std::endl;
-        return;
-    }
+    // if (const_cast<Tensor<float>&>(tensor).shape().number() < 2) {
+    //     std::cerr << "[WARN] Tensor has less than 2 dimensions. Skipping save to: " << path << std::endl;
+    //     return;
+    // }
 
+    // int height = static_cast<int>(tensor.shape().dim(0));
+    // int width = static_cast<int>(tensor.shape().dim(1));
+    // cv::Mat out_img(height, width, CV_32F);
+
+    // for (int r = 0; r < height; ++r) {
+    //     for (int c = 0; c < width; ++c) {
+    //         out_img.at<float>(r, c) = tensor.at(r, c);
+    //     }
+    // }
+
+    // cv::Mat normalized_img;
+    // cv::normalize(out_img, normalized_img, 0, 255, cv::NORM_MINMAX);
+    // normalized_img.convertTo(normalized_img, CV_8U);
+    // cv::imwrite(path, normalized_img);
     int height = static_cast<int>(tensor.shape().dim(0));
     int width = static_cast<int>(tensor.shape().dim(1));
     cv::Mat out_img(height, width, CV_32F);
 
-    for (int r = 0; r < height; ++r) {
-        for (int c = 0; c < width; ++c) {
+    for (int r = 0; r < height; ++r)
+        for (int c = 0; c < width; ++c)
             out_img.at<float>(r, c) = tensor.at(r, c);
-        }
-    }
 
+    // Normalize this specific feature map individually!
     cv::Mat normalized_img;
     cv::normalize(out_img, normalized_img, 0, 255, cv::NORM_MINMAX);
     normalized_img.convertTo(normalized_img, CV_8U);
+
     cv::imwrite(path, normalized_img);
+
 }
 
 int main(int argc, char** argv) {
@@ -149,29 +167,20 @@ int main(int argc, char** argv) {
     if (image_paths.empty())
         throw std::runtime_error("No .png images found in: " + infer_dir);
     for (const auto& image_path : image_paths) {
-        cv::Mat img = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
+        cv::Mat img = cv::imread(image_path, cv::IMREAD_COLOR);
         if (img.empty()) {
             std::cerr << "Failed to load image: " << image_path << std::endl;
             continue;
         }
-        // Tensor<float> tensor(Shape({static_cast<size_t>(img.rows), static_cast<size_t>(img.cols)}));
-        // for (int r = 0; r < img.rows; ++r)
-        //     for (int c = 0; c < img.cols; ++c)
-        //         tensor.at(r, c) = static_cast<float>(img.at<uchar>(r, c)) / 255.0f;
-
-        Tensor<float> tensor(Shape({static_cast<size_t>(img.rows), static_cast<size_t>(img.cols), 3}));
+          Tensor<float> tensor(Shape({static_cast<size_t>(img.rows), static_cast<size_t>(img.cols), 3}));
         for (int r = 0; r < img.rows; ++r)
             for (int c = 0; c < img.cols; ++c)
                 for (int ch = 0; ch < 3; ++ch)
                     tensor.at(r, c, ch) = static_cast<float>(img.at<cv::Vec3b>(r, c)[ch]) / 255.0f;
-
-
-
         std::string label = std::filesystem::path(image_path).parent_path().filename().string();
         onoff.compute_shape(tensor.shape());
         onoff.process_test(label, tensor);
         std::cout << "[DEBUG] After on off - " <<  tensor.shape().to_string() << std::endl;
-
         scale.process_test(label, tensor);
         Tensor<Time> latency_tensor(tensor.shape());
         code.process(tensor, latency_tensor);
@@ -180,15 +189,28 @@ int main(int argc, char** argv) {
             float val = static_cast<float>(latency_tensor.at_index(i));
             reconverted_tensor.at_index(i) = std::clamp(val, 0.0f, 1.0f);
         }
-        conv.compute_shape(tensor.shape());
+        conv.compute_shape(latency_tensor.shape());
         load_convolution_weights_from_json(conv, model_dir + "/weights.json");
         Tensor<float> thresholds(Shape({conv.depth()}));
-        std::fill(thresholds.begin(), thresholds.end(), 1.0f);
+
+        std::default_random_engine rng(42);
+        std::normal_distribution<float> dist(1.0f, 0.1f);
+
+        for (size_t i = 0; i < thresholds.shape().dim(0); ++i) {
+            thresholds.at(i) = dist(rng);
+        }
+        std::cout << "[DEBUG] THRESHOLD SHAPE - " <<  thresholds.shape().to_string() << std::endl;
+        std::cout << "[DEBUG] Thresholds values:\n";
+        for (size_t i = 0; i < thresholds.shape().dim(0); ++i)
+            std::cout << thresholds.at(i) << " ";
+        std::cout << std::endl;
+
         conv.set_thresholds(thresholds);
         conv.process_test_sample_inference(label, reconverted_tensor, 0, image_paths.size());
+        std::cout << "[DEBUG] conv.process_test_sample_inference - " <<  reconverted_tensor.shape().to_string() << std::endl;
 
-        // Visualize each depth slice as a separate image (up to a max for sanity)
-        int max_visualizations = std::min(static_cast<int>(reconverted_tensor.shape().dim(2)), 8);
+        
+       int max_visualizations = static_cast<int>(reconverted_tensor.shape().dim(2));
         for (int z = 0; z < max_visualizations; ++z) {
             Tensor<float> single_feature_map(Shape({reconverted_tensor.shape().dim(0), reconverted_tensor.shape().dim(1)}));
             for (size_t i = 0; i < single_feature_map.shape().dim(0); ++i) {
@@ -200,44 +222,21 @@ int main(int argc, char** argv) {
             std::string output_path = "featuremap_" + std::to_string(z) + "_" + std::filesystem::path(image_path).stem().string() + ".png";
             save_tensor_as_image(single_feature_map, output_path);
         }
-
-
-
-        // Continue with feature processing
         sum_pool.compute_shape_inference(reconverted_tensor.shape());
         sum_pool.process_test(label, reconverted_tensor);
-        std::cout << "[DEBUG] After SumPooling - first 5 values: ";
-        int printed = 0;
-        for (auto it = reconverted_tensor.begin(); it != reconverted_tensor.end() && printed < 5; ++it, ++printed) {
-            std::cout << *it << " ";
-        }
+        std::cout << "[DEBUG] SumPool shape: " << reconverted_tensor.shape().to_string() << std::endl;
+        for (size_t i = 0; i < 10; ++i)
+            std::cout << reconverted_tensor.at_index(i) << " ";
         std::cout << std::endl;
-
         scaling.compute_shape(reconverted_tensor.shape());
         scaling.load_params("/home/iulia/MASTER THESIS/GOOD-CSNN-SIMULATOR/params");
         scaling.process_test(label, reconverted_tensor);
-
-        std::cout << "[DEBUG] First 5 values of reconverted_tensor after scaling: ";
-        printed = 0;
-        for (auto it = reconverted_tensor.begin(); it != reconverted_tensor.end() && printed < 5; ++it, ++printed) {
-            std::cout << *it << " ";
-        }
-        std::cout << std::endl;
-
-
-
         std::vector<float> flat_feature;
         flat_feature.reserve(reconverted_tensor.shape().product());
         for (auto it = reconverted_tensor.begin(); it != reconverted_tensor.end(); ++it)
             flat_feature.push_back(*it);
-
-
-        std::cout << "Feature vector:\n";
-        for (size_t i = 0; i < flat_feature.size(); ++i) {
-            std::cout << flat_feature[i] << " ";
-        }
+        std::cout << "flat feature size: " << flat_feature.size() << std::endl;
         std::cout << "\n";
-
         double prediction = svm.predict(flat_feature);
         std::cout << "Predicted: " << prediction << " for image: " << image_path << std::endl;
     }

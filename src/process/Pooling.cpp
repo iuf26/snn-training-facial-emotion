@@ -119,8 +119,6 @@ Shape SumPooling::compute_shape(const Shape &shape)
 
 Shape SumPooling::compute_shape_inference(const Shape &shape)
 {
-	// _target_width = parameter<size_t>("width").get();
-	// _target_height = parameter<size_t>("height").get();
 	_width = shape.dim(0);
 	_height = shape.dim(1);
 	_depth = shape.dim(2);
@@ -140,10 +138,42 @@ void SumPooling::process_test(const std::string &, Tensor<float> &sample)
 	_process(sample);
 }
 
+// void SumPooling::_process(Tensor<float> &in) const
+// {
+
+
+// 	size_t output_width = std::min<size_t>(_target_width, _width);
+// 	size_t output_height = std::min<size_t>(_target_height, _height);
+// 	size_t filter_width = _width / output_width;
+// 	size_t filter_height = _height / output_height;
+
+// 	Tensor<float> out(Shape({output_width, output_height, _depth, _conv_depth}));
+
+// 	for (size_t x = 0; x < output_width; x++)
+// 	{
+// 		for (size_t y = 0; y < output_height; y++)
+// 		{
+// 			for (size_t z = 0; z < _depth; z++)
+// 				for (size_t k = 0; k < _conv_depth; k++)
+// 				{
+// 					float v = 0;
+
+// 					for (size_t fx = 0; fx < filter_width; fx++)
+// 					{
+// 						for (size_t fy = 0; fy < filter_height; fy++)
+// 						{
+// 							v += in.shape().number() > 3 ? in.at(x * filter_width + fx, y * filter_height + fy, z, k) : in.at(x * filter_width + fx, y * filter_height + fy, z);
+// 						}
+// 					}
+
+// 					out.at(x, y, z, k) = v;
+// 				}
+// 		}
+// 	}
+// 	in = out;
+// }
 void SumPooling::_process(Tensor<float> &in) const
 {
-
-
 	size_t output_width = std::min<size_t>(_target_width, _width);
 	size_t output_height = std::min<size_t>(_target_height, _height);
 	size_t filter_width = _width / output_width;
@@ -151,30 +181,41 @@ void SumPooling::_process(Tensor<float> &in) const
 
 	Tensor<float> out(Shape({output_width, output_height, _depth, _conv_depth}));
 
-	for (size_t x = 0; x < output_width; x++)
-	{
-		for (size_t y = 0; y < output_height; y++)
-		{
-			for (size_t z = 0; z < _depth; z++)
-				for (size_t k = 0; k < _conv_depth; k++)
-				{
-					float v = 0;
+	for (size_t x = 0; x < output_width; x++) {
+		for (size_t y = 0; y < output_height; y++) {
+			for (size_t z = 0; z < _depth; z++) {
+				for (size_t k = 0; k < _conv_depth; k++) {
 
-					for (size_t fx = 0; fx < filter_width; fx++)
-					{
-						for (size_t fy = 0; fy < filter_height; fy++)
-						{
-							v += in.shape().number() > 3 ? in.at(x * filter_width + fx, y * filter_height + fy, z, k) : in.at(x * filter_width + fx, y * filter_height + fy, z);
+					double v = 0.0;  // Use double for accumulation
+
+					for (size_t fx = 0; fx < filter_width; fx++) {
+						for (size_t fy = 0; fy < filter_height; fy++) {
+							float val = in.shape().number() > 3
+								? in.at(x * filter_width + fx, y * filter_height + fy, z, k)
+								: in.at(x * filter_width + fx, y * filter_height + fy, z);
+
+							if (std::isfinite(val)) {
+								v += static_cast<double>(val);
+							}
 						}
 					}
 
-					out.at(x, y, z, k) = v;
+					// Clamp or reset if overflow happened
+					if (!std::isfinite(v)) {
+						std::cerr << "[WARN] Overflow at (" << x << "," << y << "," << z << "," << k << ")\n";
+						v = 0.0;  // or a max allowed cap
+					}
+
+					out.at(x, y, z, k) = static_cast<float>(v);
 				}
+			}
 		}
 	}
 
 	in = out;
 }
+
+
 
 
 static RegisterClassParameter<TemporalPooling, ProcessFactory> _tmp_register("TemporalPooling");
